@@ -1,0 +1,54 @@
+<?php
+
+use App\Http\Controllers\Products\ProductController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Orders\OrderController;
+use App\Http\Controllers\ImportController;
+use Inertia\Inertia;
+
+// Route::get('/', function () {
+//     return Inertia::render('welcome');
+// })->name('home');
+
+
+// we will use the dashboard as sorta like a 'home'
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('dashboard');
+    })->name('dashboard');
+    Route::get('/orders', function () {
+        return Inertia::render('orders');
+    })->name('orders');
+
+    // products
+
+    Route::prefix('products')->group(function () {
+        Route::get('/', function () {
+            return Inertia::render('products/index');
+        })->name('products.index');
+
+        Route::post('/create', function () {
+            return Inertia::render('products/create');
+        })->name('products.create');
+
+
+
+        Route::get('/{id}', function ($id) {
+            return Inertia::render('products/show', ['id' => $id]);
+        })->name('products.show');
+
+        Route::put('/{id}/edit', function ($id) {
+            return Inertia::render('products/edit', ['id' => $id]);
+        })->name('products.edit');
+
+        // Import users/products via CSV/Excel
+        Route::post('/import', [ProductController::class, 'import'])
+            ->name('products.import');
+    });
+
+
+});
+
+
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

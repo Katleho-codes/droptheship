@@ -1,0 +1,194 @@
+import { Product } from "@/types";
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { Button } from "./ui/button";
+import { Checkbox } from "./ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "./ui/alert-dialog"
+import { router } from "@inertiajs/react";
+
+const columns: ColumnDef<Product>[] = [
+    {
+        id: "select",
+        header: ({ table }) => (
+            <Checkbox
+                checked={
+                    table.getIsAllPageRowsSelected() ||
+                    (table.getIsSomePageRowsSelected() && "indeterminate")
+                }
+                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+                aria-label="Select all"
+            />
+        ),
+        cell: ({ row }) => (
+            <Checkbox
+                checked={row.getIsSelected()}
+                onCheckedChange={(value) => row.toggleSelected(!!value)}
+                aria-label="Select row"
+            />
+        ),
+        enableSorting: false,
+        enableHiding: false,
+    },
+    {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+            const product = row.original;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                            onClick={() => router.visit(route("products.edit", product.id))}
+                        //   onClick={() => navigator.clipboard.writeText(payment.id)}
+                        >
+                            Edit product
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {/* Delete with confirmation */}
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                {/* // prevents menu from closing too soon */}
+                                <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
+                                    Delete
+                                </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently
+                                        delete <span className="font-semibold">Product</span>.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => console.log("delete", product.id)}
+                                    >
+                                        Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                        <DropdownMenuItem>View customer</DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )
+        }
+    },
+    {
+        accessorKey: "name",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Product
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div className="capitalize">{row.getValue("name")}</div>
+    },
+    {
+        accessorKey: "status",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Status
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div className="capitalize">{row.getValue("status")}</div>
+    },
+    {
+        accessorKey: "stock_quantity",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Stock quantity
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => <div className="capitalize">{row.getValue("stock_quantity")}</div>
+    },
+    {
+        accessorKey: "sale_price",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Sale price
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("sale_price"))
+            // Format the amount as a dollar amount
+            const formatted = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "ZAR",
+            }).format(amount)
+            return <div className="font-medium">{formatted}</div>
+        },
+    },
+    {
+        accessorKey: "cost_price",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Cost price
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const amount = parseFloat(row.getValue("cost_price"))
+            // Format the amount as a dollar amount
+            const formatted = new Intl.NumberFormat("en-US", {
+                style: "currency",
+                currency: "ZAR",
+            }).format(amount)
+            return <div className="font-medium">{formatted}</div>
+        },
+    },
+
+]
+export default columns;
