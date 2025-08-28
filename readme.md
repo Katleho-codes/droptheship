@@ -5,7 +5,7 @@
 ### 🛍️ Product Management
 - [x] Add/Edit/Delete products
 - [x] Product variants (size, color, etc.)
-- [ ] Bulk import via CSV/Excel
+- [x] Bulk import via CSV/Excel
 - [ ] Sync inventory from suppliers (API or scraping)
 - [x] Product status (active, inactive, archived)
 
