@@ -29,9 +29,29 @@ class ProductController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,csv,txt'
         ]);
-        Excel::import(new ProductsImport, $request->file('file'));
+     try {
+           Excel::import(new ProductsImport, $request->file('file'));
 
-        return back()->with('success', 'Data imported successfully!');
+       
+        return response()->json([
+            'message' => 'Products imported successfully.',
+        ], 201);
+     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+     $failures = $e->failures();
+
+        return response()->json([
+            'success' => false,
+            'message' => 'Validation errors occurred.',
+            'errors'  => collect($failures)->map(function ($failure) {
+                return [
+                    'row'    => $failure->row(), // row that went wrong
+                    'attr'   => $failure->attribute(), // column name
+                    'errors' => $failure->errors(),   // actual error messages
+                    'value'  => $failure->values(),   // full row data
+                ];
+            }),
+        ], 422);
+     }
     }
 
     /**

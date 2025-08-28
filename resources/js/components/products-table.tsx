@@ -4,9 +4,10 @@ import { ProductsTableProps } from '@/types';
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
 
-import AddProduct from './add-product';
+import AddProduct from './add-product-form';
 import columns from './products-table-columns';
 import { Button } from './ui/button';
+import AddProductDialog from './add-product-dialog';
 
 
 
@@ -144,7 +145,7 @@ export const ProductsTable = ({
 
 
             {
-                openAddProductModal ? <AddProduct open={openAddProductModal} setOpen={setOpenAddProductModal} /> : null
+                openAddProductModal ? <AddProductDialog open={openAddProductModal} setOpen={setOpenAddProductModal} /> : null
             }
         </>
     )

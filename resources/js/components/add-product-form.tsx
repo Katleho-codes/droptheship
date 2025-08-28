@@ -14,12 +14,8 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { toast } from 'sonner';
 
-type TDialog = {
-  open: boolean;
-  setOpen: (data: boolean) => void;
-}
 
-export default function AddProduct({ open, setOpen }: TDialog) {
+export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) => void }) {
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
@@ -83,20 +79,7 @@ export default function AddProduct({ open, setOpen }: TDialog) {
 
   };
 
-  return <>
-
-    <Dialog open={open} onOpenChange={() => setOpen(!open)}>
-      {/* <Create /> */}
-      <DialogTrigger asChild>
-        <Button variant="outline">Open Dialog</Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>Add product</DialogTitle>
-          <DialogDescription>
-            Step {step} of {totalSteps}
-          </DialogDescription>
-        </DialogHeader>
+  return (
         <form onSubmit={handleSubmit}>
           {
             step === 1 && (
@@ -281,9 +264,5 @@ export default function AddProduct({ open, setOpen }: TDialog) {
             </button>
           </div> */}
         </form>
-
-      </DialogContent>
-    </Dialog>
-
-  </>
+  )
 }
