@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Imports\OrdersImport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Str;
 
 class OrderController extends Controller
 {
@@ -82,7 +83,11 @@ class OrderController extends Controller
         $order = Order::create($validated);
 
         // Step 2: generate order number using the assigned ID
-        $order->order_number = 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        // $order->order_number = 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        $order->order_number = 'ORD-' . strtoupper(Str::random(8));
+        while (Order::where('order_number', $order->order_number)->exists()) {
+            $order->order_number = 'ORD-' . strtoupper(Str::random(8));
+        }
         $order->save();
         // ORD-9F2D4A1B
 

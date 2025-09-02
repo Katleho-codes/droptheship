@@ -1,12 +1,11 @@
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Order } from '@/types';
+import { router } from '@inertiajs/react';
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
 import columns from './orders-table-columns';
 import { Button } from './ui/button';
-import AddOrderDialog from './add-order-dialog';
-import { router } from '@inertiajs/react';
 
 type OrdersTableProps = {
     data: Order[];
@@ -147,10 +146,6 @@ export const OrdersTable = ({
                         </Button>
                     </div>
                 </div> : null
-            }
-
-            {
-                openAddOrderModal ? <AddOrderDialog open={openAddOrderModal} setOpen={setOpenAddOrderModal} /> : null
             }
 
         </>

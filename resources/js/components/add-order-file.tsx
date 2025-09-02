@@ -1,93 +1,69 @@
+import React, { FormEventHandler, useState } from 'react'
+import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { Button } from './ui/button';
+import axios from 'axios';
+import { toast } from 'sonner';
 
-import * as React from "react"
-import { Check, ChevronsUpDown } from "lucide-react"
+function AddOrderFile() {
+    const [file, setFile] = useState<File | null>(null)
+    const [fileLoading, setFileLoading] = useState(false)
+    const [errors, setErrors] = useState<Record<string, string[]>>({});
 
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "./ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "./ui/popover"
 
-const frameworks = [
-  {
-    value: "next.js",
-    label: "Next.js",
-  },
-  {
-    value: "sveltekit",
-    label: "SvelteKit",
-  },
-  {
-    value: "nuxt.js",
-    label: "Nuxt.js",
-  },
-  {
-    value: "remix",
-    label: "Remix",
-  },
-  {
-    value: "astro",
-    label: "Astro",
-  },
-]
+    const submit: FormEventHandler = async (e) => {
+        e.preventDefault();
+        try {
+            setFileLoading(true)
+            const formData = new FormData()
+            if (file) {
+                formData.append('file', file)
+            }
 
-export default function AddOrderFile() {
-  const [open, setOpen] = React.useState(false)
-  const [value, setValue] = React.useState("")
 
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
-          {value
-            ? frameworks.find((framework) => framework.value === value)?.label
-            : "Select framework..."}
-          <ChevronsUpDown className="opacity-50" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-[200px] p-0">
-        <Command>
-          <CommandInput placeholder="Search framework..." className="h-9" />
-          <CommandList>
-            <CommandEmpty>No framework found.</CommandEmpty>
-            <CommandGroup>
-              {frameworks.map((framework) => (
-                <CommandItem
-                  key={framework.value}
-                  value={framework.value}
-                  onSelect={(currentValue) => {
-                    setValue(currentValue === value ? "" : currentValue)
-                    setOpen(false)
-                  }}
+            // Example: send it somewhere
+            // await fetch('/upload', { method: 'POST', body: formData })
+            const { data } = await axios.post("http://localhost:8000/orders/import",
+                formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                    "Accept": "application/json"
+                }
+            });
+            console.log("data import", data)
+            if (data?.success === true) {
+                toast(data?.message);
+            }
+        } catch (error: any) {
+            console.error("add order files error", error);
+            if (error?.response && error.response.status === 422) {
+                setErrors(error?.response.data.errors); // 👈 store backend errors
+            }
+        } finally {
+            setFileLoading(false)
+        }
+    }
+    return (
+        <>
+            <form onSubmit={submit}>
+                <Label className="block font-medium mb-1">Select the file you are importing</Label>
+                <Input
+                    type="file"
+                    name="files"
+                    onChange={(e) => setFile(e.target.files ? e.target.files[0] : null)}
+                />
+                {errors.file && (
+                    <p className="text-red-500 text-sm">{errors.file[0]}</p>
+                )}
+                <Button
+                    type="submit"
+                    className='mt-6'
                 >
-                  {framework.label}
-                  <Check
-                    className={cn(
-                      "ml-auto",
-                      value === framework.value ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
-  )
+                    {fileLoading ? 'Loading...' : 'Upload'}
+                </Button>
+            </form>
+        </>
+    )
 }
+
+export default AddOrderFile

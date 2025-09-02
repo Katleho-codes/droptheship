@@ -52,7 +52,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', function () {
             return Inertia::render('orders/create');
         })->name('orders.create');
-
+  // Import users/products via CSV/Excel
+        Route::post('/import', [OrderController::class, 'import'])
+            ->name('orders.import');
     });
 
 

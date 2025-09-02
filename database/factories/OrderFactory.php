@@ -28,7 +28,8 @@ class OrderFactory extends Factory
             'notes' => $this->faker->optional()->sentence(),
             'created_at' => $createdAt,
             'updated_at' => $updatedAt,
-            'order_number' => strtoupper($this->faker->unique()->bothify('ORD-#####')), // << HERE
+            'order_number' => 'ORD-' . strtoupper($this->faker->unique()->regexify('[A-Z0-9]{8}'))
+
         ];
     }
 }
