@@ -1,18 +1,10 @@
 import axios from 'axios';
 import { FormEventHandler, useState } from 'react';
+import { toast } from 'sonner';
 import { Button } from './ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from './ui/dialog';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { toast } from 'sonner';
 
 
 export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) => void }) {

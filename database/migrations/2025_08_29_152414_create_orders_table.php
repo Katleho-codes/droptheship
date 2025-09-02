@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->timestamps();
             // points to users.id
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('user_id')->nullable()->constrained('customers')->nullOnDelete();
             $table->string('status', 20)->nullable();
             $table->decimal('total_amount', 10, 2);
             $table->string('currency', 3)->nullable();
@@ -22,6 +22,7 @@ return new class extends Migration {
             $table->string('payment_status')->nullable();
             $table->string('notes')->nullable();
             $table->string('billing_address_id')->nullable();
+            $table->string('order_number')->nullable()->after('order_number');
         });
     }
 

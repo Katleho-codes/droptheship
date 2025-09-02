@@ -46,6 +46,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('products.import');
     });
 
+    // orders
+    Route::prefix('orders')->group(function () {
+ 
+        Route::get('/create', function () {
+            return Inertia::render('orders/create');
+        })->name('orders.create');
+
+    });
+
 
 });
 

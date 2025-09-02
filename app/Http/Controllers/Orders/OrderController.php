@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Orders;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Imports\OrdersImport;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class OrderController extends Controller
 {
@@ -16,14 +18,48 @@ class OrderController extends Controller
     {
         // $orders = Order::with('user:id,email')->latest()->paginate(10);
         // return response()->json($orders);
-            $orders = DB::table('orders')
-        ->join('users', 'orders.user_id', '=', 'users.id')
-        ->select('orders.*', 'users.email as email')
-        ->latest('orders.created_at')
-        ->paginate(10);
+        $orders = DB::table('orders')
+            ->join('customers', 'orders.user_id', '=', 'customers.id')
+            ->select('orders.*', 'customers.email as email')
+            ->latest('orders.created_at')
+            ->paginate(10);
 
-    return response()->json($orders);
+        return response()->json($orders);
     }
+    /**
+     * Import a newly created resource in storage.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,txt'
+        ]);
+        try {
+            Excel::import(new OrdersImport, $request->file('file'));
+
+
+            return response()->json([
+                'message' => 'Orders imported successfully.',
+            ], 201);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors occurred.',
+                'errors' => collect($failures)->map(function ($failure) {
+                    return [
+                        'row' => $failure->row(), // row that went wrong
+                        'attr' => $failure->attribute(), // column name
+                        'errors' => $failure->errors(),   // actual error messages
+                        'value' => $failure->values(),   // full row data
+                    ];
+                }),
+            ], 422);
+        }
+    }
+
+
 
     /**
      * Store a newly created resource in storage.
@@ -31,7 +67,7 @@ class OrderController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'user_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:customers,id',
             'status' => 'nullable|string|max:20',
             'total_amount' => 'required|numeric|min:0',
             'currency' => 'nullable|string|size:3',
@@ -41,20 +77,21 @@ class OrderController extends Controller
             'billing_address_id' => 'nullable|exists:addresses,id',
             'notes' => 'nullable|string',
         ]);
-        $orderNumber = 'ORD-' . strtoupper(uniqid());
 
-        $order = Order::create([
-            ...$validated,
-            'order_number' => $orderNumber
-        ]);
-        $order->id; // using id as uuid
+        // Step 1: create the order without order_number
+        $order = Order::create($validated);
+
+        // Step 2: generate order number using the assigned ID
+        $order->order_number = 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
+        $order->save();
+        // ORD-9F2D4A1B
 
         return response()->json([
             'message' => 'Order created successfully',
             'order' => $order
         ], 201);
-
     }
+
 
     /**
      * Display the specified resource.

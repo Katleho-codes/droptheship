@@ -20,7 +20,6 @@ export const useOrders = () => {
     try {
       setOrdersLoading(true);
       const response = await axios.get(`http://localhost:8000/api/orders?page=${page}`);
-      console.log("response", response);
       if (response?.data) {
         const { data, last_page, total } = response.data;
         setOrders(data);

@@ -4,10 +4,9 @@ import { ProductsTableProps } from '@/types';
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
 
-import AddProduct from './add-product-form';
+import AddProductDialog from './add-product-dialog';
 import columns from './products-table-columns';
 import { Button } from './ui/button';
-import AddProductDialog from './add-product-dialog';
 
 
 
@@ -46,7 +45,6 @@ export const ProductsTable = ({
             pagination
         },
         onPaginationChange: setPagination, // Update the pagination state
-
         manualPagination: true, // we control pagination
     })
 

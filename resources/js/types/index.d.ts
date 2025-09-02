@@ -107,6 +107,9 @@ export interface Supplier {
     address:string;
     phone?:string; 
 }
+export interface GetCustomer {
+
+}
 export type ProductsTableProps = {
     data: Product[];
     pagination: PaginationState;

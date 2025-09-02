@@ -5,6 +5,8 @@ import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, g
 import { useState } from 'react';
 import columns from './orders-table-columns';
 import { Button } from './ui/button';
+import AddOrderDialog from './add-order-dialog';
+import { router } from '@inertiajs/react';
 
 type OrdersTableProps = {
     data: Order[];
@@ -29,6 +31,7 @@ export const OrdersTable = ({
     const [columnVisibility, setColumnVisibility] =
         useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = useState({})
+     const [openAddOrderModal, setOpenAddOrderModal] = useState(false)
 
     const table = useReactTable({
         data,
@@ -57,7 +60,7 @@ export const OrdersTable = ({
 
     return (
         <>
-            <div className="flex items-center py-4">
+            <div className="flex justify-between items-center py-4">
                 <Input
                     placeholder="Filter orders..."
                     value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -66,7 +69,9 @@ export const OrdersTable = ({
                     }
                     className="max-w-sm"
                 />
-                {/* todo: maybe a 'show all' button here?? */}
+                {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
+                <Button className='cursor-pointer' onClick={()=>router.visit(route("orders.create"))}>Add order</Button>
+
             </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
@@ -144,7 +149,9 @@ export const OrdersTable = ({
                 </div> : null
             }
 
-
+            {
+                openAddOrderModal ? <AddOrderDialog open={openAddOrderModal} setOpen={setOpenAddOrderModal} /> : null
+            }
 
         </>
     )

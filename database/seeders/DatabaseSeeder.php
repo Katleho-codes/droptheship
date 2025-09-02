@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Customer;
 use App\Models\User;
 use App\Models\Product;
 use App\Models\Order;
@@ -24,7 +25,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         // Create 10 random users
-        $users = User::factory(100)->create();
+        $customers = Customer::factory(100)->create();
 
         // Create 50 products
         Product::factory(100)->create();
@@ -33,7 +34,7 @@ class DatabaseSeeder extends Seeder
 
         // Create 20 orders linked to random users
         Order::factory(100)->create([
-            'user_id' => $users->random()->id,
+            'user_id' => $customers->random()->id,
         ]);
     }
 }
