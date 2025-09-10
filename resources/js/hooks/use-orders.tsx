@@ -22,6 +22,7 @@ export const useOrders = () => {
       const response = await axios.get(`http://localhost:8000/api/orders?page=${page}`);
       if (response?.data) {
         const { data, last_page, total } = response.data;
+        console.log("orders ", data)
         setOrders(data);
         setPageCount(last_page);
         setTotalRecords(total);

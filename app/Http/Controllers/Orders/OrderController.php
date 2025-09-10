@@ -17,16 +17,27 @@ class OrderController extends Controller
      */
     public function index()
     {
-        // $orders = Order::with('user:id,email')->latest()->paginate(10);
-        // return response()->json($orders);
         $orders = DB::table('orders')
             ->join('customers', 'orders.user_id', '=', 'customers.id')
-            ->select('orders.*', 'customers.email as email')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(
+                'orders.*',
+                'customers.email as email',
+                'customers.first_name as first_name',
+                'customers.last_name as last_name',
+                'customers.phone as phone',
+                'products.name as product_name',
+                'products.description as product_description',
+                'products.sale_price as price',
+                'products.name as product_name',
+                'products.main_image_url as product_image'
+            )
             ->latest('orders.created_at')
             ->paginate(10);
 
         return response()->json($orders);
     }
+
     /**
      * Import a newly created resource in storage.
      */
@@ -69,13 +80,21 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:customers,id',
+            'product_id' => 'required|exists:products,id',
             'status' => 'nullable|string|max:20',
             'total_amount' => 'required|numeric|min:0',
+            'quantity' => 'required|numeric|min:1',
+            'discount' => 'nullable|numeric|min:1',
+            'shipping_cost' => 'required|numeric|min:0',
+            'color' => 'nullable|string',
+            'cancel_order' => 'required|boolean',
             'currency' => 'nullable|string|size:3',
             'payment_method' => 'nullable|string|max:50',
             'payment_status' => 'nullable|string|max:20',
-            'shipping_address_id' => 'nullable|exists:addresses,id',
-            'billing_address_id' => 'nullable|exists:addresses,id',
+            'address' => 'nullable|string|max:50',
+            'state' => 'nullable|string|max:80',
+            'postal_code' => 'nullable|string|max:6',
+            'country' => 'nullable|string',
             'notes' => 'nullable|string',
         ]);
 

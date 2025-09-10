@@ -92,7 +92,6 @@ const columns: ColumnDef<Product>[] = [
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )

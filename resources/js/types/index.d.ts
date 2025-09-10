@@ -59,6 +59,7 @@ export interface AddProduct {
 }
 
 export interface GetProduct {
+    id:number;
     name: string;
     description: string;
     cost_price: number;

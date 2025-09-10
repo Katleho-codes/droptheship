@@ -16,9 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
-    Route::get('/orders', function () {
-        return Inertia::render('orders');
-    })->name('orders');
+ 
 
     // products
 
@@ -37,7 +35,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
             return Inertia::render('products/show', ['id' => $id]);
         })->name('products.show');
 
-        Route::put('/{id}/edit', function ($id) {
+        Route::get('/{id}/edit', function ($id) {
             return Inertia::render('products/edit', ['id' => $id]);
         })->name('products.edit');
 
@@ -52,6 +50,12 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/create', function () {
             return Inertia::render('orders/create');
         })->name('orders.create');
+           Route::get('/', function () {
+        return Inertia::render('orders/index');
+    })->name('orders.index');
+        Route::get('/{id}/edit', function ($id) {
+            return Inertia::render('orders/edit', ['id' => $id]);
+        })->name('orders.edit');
   // Import users/products via CSV/Excel
         Route::post('/import', [OrderController::class, 'import'])
             ->name('orders.import');

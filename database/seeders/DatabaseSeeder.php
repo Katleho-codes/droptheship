@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
         // Create 20 orders linked to random users
         Order::factory(100)->create([
             'user_id' => $customers->random()->id,
+            'product_id' => Product::factory(100)->create()->random()->id,
         ]);
     }
 }

@@ -1,8 +1,21 @@
 import { Order } from "@/types";
+import { router } from "@inertiajs/react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "./ui/alert-dialog";
 import { Button } from "./ui/button";
 import { Checkbox } from "./ui/checkbox";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 const columns: ColumnDef<Order>[] = [
     {
@@ -26,6 +39,63 @@ const columns: ColumnDef<Order>[] = [
         ),
         enableSorting: false,
         enableHiding: false,
+    },
+     {
+        id: "actions",
+        enableHiding: false,
+        cell: ({ row }) => {
+            const order = row.original;
+
+            return (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal />
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                            onClick={() => router.visit(route("orders.edit", order.id))}
+                        //   onClick={() => navigator.clipboard.writeText(payment.id)}
+                        >
+                            View order
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {/* Delete with confirmation */}
+                        <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                {/* // prevents menu from closing too soon */}
+                                <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
+                                    Delete
+                                </DropdownMenuItem>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                    <AlertDialogTitle>
+                                        Are you sure?
+                                    </AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        This action cannot be undone. This will permanently
+                                        delete <span className="font-semibold">Order</span>.
+                                    </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                        className="bg-red-600 hover:bg-red-700"
+                                        onClick={() => console.log("delete", order.id)}
+                                    >
+                                        Delete
+                                    </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                        </AlertDialog>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )
+        }
     },
     {
         accessorKey: "order_number",

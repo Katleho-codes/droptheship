@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-09-10
+
+### Added
+
+- added a product id fk in orders
+- added address, postal_code, state in orders
+- get order with the customer and product
+- view single order page (still empty)
+
 ## [Unreleased] - 2025-09-02
 
 ### Added

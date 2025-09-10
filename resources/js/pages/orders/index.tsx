@@ -3,12 +3,18 @@ import { useOrders } from '@/hooks/use-orders';
 import AppLayout from '@/layouts/app-layout';
 import { Head } from '@inertiajs/react';
 
+const breadcrumbs: BreadcrumbItem[] = [
+    {
+        title: 'Orders',
+        // href: '/dashboard',
+    },
+];
 
-const Products = () => {
+const Orders = () => {
     const { orders, pagination, setPagination, pageCount } = useOrders();
 
     return (
-        <AppLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Orders" />
             <div className="w-full mx-auto py-2 px-3">
                 <OrdersTable data={orders} pagination={pagination}
@@ -20,4 +26,4 @@ const Products = () => {
     )
 }
 
-export default Products
+export default Orders
