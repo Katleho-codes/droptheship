@@ -122,6 +122,23 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
+        $order = DB::table('orders')
+            ->join('customers', 'orders.user_id', '=', 'customers.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(
+                'orders.*',
+                'customers.email as email',
+                'customers.first_name as first_name',
+                'customers.last_name as last_name',
+                'customers.phone as phone',
+                'products.name as product_name',
+                'products.description as product_description',
+                'products.sale_price as price',
+                'products.main_image_url as product_image'
+            )
+            ->where('orders.id', $order->id) // ✅ use $order->id from model binding
+            ->first();
+
         return $order;
     }
 

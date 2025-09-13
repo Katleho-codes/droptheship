@@ -7,7 +7,7 @@ import {
 } from "@tanstack/react-table";
 
 export const useOrders = () => {
- const [orders, setOrders] = useState<Order[]>([])
+  const [orders, setOrders] = useState<Order[]>([])
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -15,6 +15,7 @@ export const useOrders = () => {
   });
   const [pageCount, setPageCount] = useState<number>(0);
   const [totalRecords, setTotalRecords] = useState<number>(0);
+  const [deleteOrderLoading, setDeleteOrderLoading] = useState(false)
 
   const fetchOrders = async (page: number) => {
     try {
@@ -34,8 +35,20 @@ export const useOrders = () => {
     }
   };
 
+  const deleteOrder = async (id: number | null) => {
+    setDeleteOrderLoading(true)
+    try {
+      const response = await axios.delete("http://localhost:8000/api/orders/" + id);
+      const { data, status } = response.data;
+      console.log("delete order response", response);
+    } catch (error) {
+      console.log("delete order error", error)
+    } finally {
+      setDeleteOrderLoading(false)
+    }
+  }
+
   useEffect(() => {
-    console.log(pagination.pageIndex + 1)
     fetchOrders(pagination.pageIndex + 1); // API pages are 1-based, TanStack pages are 0-based
   }, [pagination.pageIndex]);
 
@@ -46,6 +59,8 @@ export const useOrders = () => {
     setPagination,
     pageCount,
     totalRecords,
+    deleteOrder,
+    deleteOrderLoading
   };
 };
 

@@ -5,7 +5,21 @@ import { router } from '@inertiajs/react';
 import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 import { useState } from 'react';
 import columns from './orders-table-columns';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Button } from './ui/button';
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "./ui/alert-dialog";
+import { MoreHorizontal } from 'lucide-react';
+import { useOrders } from '@/hooks/use-orders';
 
 type OrdersTableProps = {
     data: Order[];
@@ -30,8 +44,7 @@ export const OrdersTable = ({
     const [columnVisibility, setColumnVisibility] =
         useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = useState({})
-     const [openAddOrderModal, setOpenAddOrderModal] = useState(false)
-
+    const [selectedRowId, setSelectedRowId] = useState(null)
     const table = useReactTable({
         data,
         columns,
@@ -55,7 +68,11 @@ export const OrdersTable = ({
 
         manualPagination: true, // we control pagination
     })
+    const handleRowSelect = (row: any) => {
+        setSelectedRowId(row.id)
+    }
 
+    const {deleteOrder, deleteOrderLoading}=useOrders();
 
     return (
         <>
@@ -69,14 +86,19 @@ export const OrdersTable = ({
                     className="max-w-sm"
                 />
                 {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
-                <Button className='cursor-pointer' onClick={()=>router.visit(route("orders.create"))}>Add order</Button>
+                <Button className='cursor-pointer' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
 
             </div>
             <div className="overflow-hidden rounded-md border">
                 <Table>
                     <TableHeader>
                         {table.getHeaderGroups().map((headerGroup) => (
+
                             <TableRow key={headerGroup.id}>
+                                {/* // This will host the "actions" */}
+                                <TableHead>
+
+                                </TableHead>
                                 {headerGroup.headers.map((header) => {
                                     return (
                                         <TableHead key={header.id}>
@@ -99,7 +121,57 @@ export const OrdersTable = ({
                                     key={row.id}
                                     data-state={row.getIsSelected() && "selected"}
                                     className='text-start'
+                                    onClick={() => handleRowSelect(row)}
                                 >
+                                    <TableCell>
+                                        <DropdownMenu>
+                                            <DropdownMenuTrigger asChild>
+                                                <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+                                                    <span className="sr-only">Open menu</span>
+                                                    <MoreHorizontal />
+                                                </Button>
+                                            </DropdownMenuTrigger>
+                                            <DropdownMenuContent align="end">
+                                                <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                                                <DropdownMenuItem
+                                                    onClick={() => router.visit(route("orders.edit", row.original.id))}
+                                                //   onClick={() => navigator.clipboard.writeText(payment.id)}
+                                                >
+                                                    View order
+                                                </DropdownMenuItem>
+                                                <DropdownMenuSeparator />
+                                                {/* Delete with confirmation */}
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        {/* // prevents menu from closing too soon */}
+                                                        <DropdownMenuItem className="text-red-600" onSelect={(e) => e.preventDefault()}>
+                                                            Delete
+                                                        </DropdownMenuItem>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>
+                                                                Are you sure?
+                                                            </AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                This action cannot be undone. This will permanently
+                                                                delete <span className="font-semibold">Order</span>.
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                            <AlertDialogAction
+                                                                className="bg-red-600 hover:bg-red-700"
+                                                                onClick={() => deleteOrder(row.original.id)}
+                                                            >
+                                                                Delete
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
+                                            </DropdownMenuContent>
+                                        </DropdownMenu>
+                                    </TableCell>
                                     {row.getVisibleCells().map((cell) => (
                                         <TableCell key={cell.id}>
                                             {flexRender(

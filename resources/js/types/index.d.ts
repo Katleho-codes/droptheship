@@ -1,6 +1,6 @@
+import { PaginationState } from '@tanstack/react-table';
 import { LucideIcon } from 'lucide-react';
 import type { Config } from 'ziggy-js';
-import { ColumnFiltersState, flexRender, getCoreRowModel, getFilteredRowModel, getPaginationRowModel, getSortedRowModel, PaginationState, SortingState, useReactTable, VisibilityState } from '@tanstack/react-table';
 
 export interface Auth {
     user: User;
@@ -61,11 +61,35 @@ export interface AddProduct {
 export interface GetProduct {
     id:number;
     name: string;
+    name: string;
     description: string;
     cost_price: number;
     sale_price: number;
-    stock_quantity: number;
-    status: "active"|"inactive"|"archived";
+    total_amount: number;
+    quantity: number;
+    discount: number;
+    status: string;
+    color: string;
+    cancel_order: string;
+    currency: string;
+    payment_method: string;
+    payment_status: string;
+    address: string;
+    state: string;
+    postal_code: string;
+notes: string;
+order_number: string;
+email: string;
+first_name: string;
+last_name: string;
+phone: string;
+product_name: string;
+product_description: string;
+price: string;
+product_image: string;
+country?: string;
+    created_at?: string;
+    discount?: string;
     barcode?: string;
     weight_grams?: number;
     supplier_id?: number;

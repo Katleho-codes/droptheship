@@ -10,7 +10,7 @@
 - [x] Product status (active, inactive, archived)
 
 ### 📦 Order Management
-- [] Add/Edit/Delete orders
+- [x] Add/Delete orders
 - [ ] Order list with filters (status, date, customer)
 - [ ] Auto-order from supplier (via API or browser automation)
 - [ ] Track order fulfillment & status
