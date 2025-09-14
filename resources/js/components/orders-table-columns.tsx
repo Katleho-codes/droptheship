@@ -1,21 +1,7 @@
 import { Order } from "@/types";
-import { router } from "@inertiajs/react";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown, MoreHorizontal } from 'lucide-react';
-import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle,
-    AlertDialogTrigger,
-} from "./ui/alert-dialog";
+import { ArrowUpDown } from 'lucide-react';
 import { Button } from "./ui/button";
-import { Checkbox } from "./ui/checkbox";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
 
 const columns: ColumnDef<Order>[] = [
     // {
@@ -58,6 +44,21 @@ const columns: ColumnDef<Order>[] = [
             )
         },
         cell: ({ row }) => <div className="font-medium">{row.getValue("order_number")}</div>
+    },
+    {
+        accessorKey: "created_at",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Created
+                    <ArrowUpDown />
+                </Button>
+            )
+        },
+        // cell: ({ row }) => <div className="font-medium">{row.getValue("created_at")}</div>
     },
     {
         accessorKey: "status",

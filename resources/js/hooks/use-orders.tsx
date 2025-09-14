@@ -17,23 +17,61 @@ export const useOrders = () => {
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [deleteOrderLoading, setDeleteOrderLoading] = useState(false)
 
-  const fetchOrders = async (page: number) => {
+  // const fetchOrders = async (page: number,) => {
+  //   try {
+  //     setOrdersLoading(true);
+  //     const response = await axios.get(`http://localhost:8000/api/orders?page=${page}`);
+  //     if (response?.data) {
+  //       const { data, last_page, total } = response.data;
+  //       console.log("orders ", data)
+  //       setOrders(data);
+  //       setPageCount(last_page);
+  //       setTotalRecords(total);
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   } finally {
+  //     setOrdersLoading(false);
+  //   }
+  // };
+  const fetchOrders = async (
+    page: number,
+    filters: {
+      status?: string;
+      date_range?: string;
+      customer_email?: string;
+    } = {}
+  ) => {
     try {
       setOrdersLoading(true);
-      const response = await axios.get(`http://localhost:8000/api/orders?page=${page}`);
+
+      const params = new URLSearchParams({
+        page: String(page),
+        ...(filters.status ? { status: filters.status } : {}),
+        ...(filters.date_range ? { date_range: filters.date_range } : {}),
+        ...(filters.customer_email ? { customer_email: filters.customer_email } : {}),
+      });
+
+      const hasFilters = Object.values(filters).some(Boolean);
+      const url = hasFilters
+        ? `http://localhost:8000/api/orders/search?${params.toString()}`
+        : `http://localhost:8000/api/orders?page=${page}`;
+
+      const response = await axios.get(url);
+
       if (response?.data) {
         const { data, last_page, total } = response.data;
-        console.log("orders ", data)
         setOrders(data);
         setPageCount(last_page);
         setTotalRecords(total);
       }
     } catch (error) {
-      console.error(error);
+      console.error("fetchOrders error", error);
     } finally {
       setOrdersLoading(false);
     }
   };
+
 
   const deleteOrder = async (id: number | null) => {
     setDeleteOrderLoading(true)
@@ -48,9 +86,9 @@ export const useOrders = () => {
     }
   }
 
-  useEffect(() => {
-    fetchOrders(pagination.pageIndex + 1); // API pages are 1-based, TanStack pages are 0-based
-  }, [pagination.pageIndex]);
+  // useEffect(() => {
+  //   fetchOrders(pagination.pageIndex + 1); // API pages are 1-based, TanStack pages are 0-based
+  // }, [pagination.pageIndex]);
 
   return {
     orders,
@@ -60,7 +98,8 @@ export const useOrders = () => {
     pageCount,
     totalRecords,
     deleteOrder,
-    deleteOrderLoading
+    deleteOrderLoading,
+    fetchOrders
   };
 };
 

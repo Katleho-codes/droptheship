@@ -55,9 +55,6 @@ class CustomerController extends Controller
                 $q,
                 fn($builder) =>
                 $builder->where('email', 'like', "%{$q}%")
-                //     ->orWhere('last_name', 'like', "%{$q}%")
-                //     ->orWhere('email', 'like', "%{$q}%")
-                //     ->orWhere('phone', 'like', "%{$q}%")
             )
             ->limit(10)
             ->get(['id', 'first_name', 'last_name', 'email', 'phone']);

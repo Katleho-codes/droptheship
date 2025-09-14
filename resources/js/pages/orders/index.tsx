@@ -1,29 +1,64 @@
 import { OrdersTable } from '@/components/orders-table';
+import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { useOrders } from '@/hooks/use-orders';
 import AppLayout from '@/layouts/app-layout';
+import { BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
+import { useEffect, useState } from 'react';
 
-const breadcrumbs: BreadcrumbItem[] = [
-    {
-        title: 'Orders',
-        // href: '/dashboard',
-    },
-];
+const breadcrumbs: BreadcrumbItem[] = [{ title: 'Orders' }];
 
 const Orders = () => {
-    const { orders, pagination, setPagination, pageCount } = useOrders();
+    const [dateFrom, setDateFrom] = useState("");
+    const [dateTo, setDateTo] = useState("");
+    const [statusFilter, setStatusFilter] = useState<string>("");
+    const [customerEmailFilter, setCustomerEmailFilter] = useState<string>("");
+
+    const { orders, fetchOrders, pagination, setPagination, pageCount } = useOrders();
+
+    const date_range = dateFrom && dateTo ? `${dateFrom}:${dateTo}` : "";
+
+    useEffect(() => {
+        // Reset pagination to first page when filters change
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
+    }, [statusFilter, customerEmailFilter, date_range]);
+
+    useEffect(() => {
+        fetchOrders(pagination.pageIndex + 1, {
+            status: statusFilter || undefined,
+            customer_email: customerEmailFilter || undefined,
+            date_range: date_range || undefined,
+        });
+    }, [pagination.pageIndex, statusFilter, customerEmailFilter, date_range]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Orders" />
-            <div className="w-full mx-auto py-2 px-3">
-                <OrdersTable data={orders} pagination={pagination}
+
+            <div className="w-full mx-auto py-2 px-3 space-y-4">
+            
+
+                {/* Orders Table */}
+                <OrdersTable
+                setStatusFilter={(value) => setStatusFilter(value)}
+                    data={orders}
+                    pagination={pagination}
                     setPagination={setPagination}
-                    pageCount={pageCount} showPagination={true}/>
+                    pageCount={pageCount}
+                    showPagination={true}
+                />
             </div>
         </AppLayout>
+    );
+};
 
-    )
-}
-
-export default Orders
+export default Orders;

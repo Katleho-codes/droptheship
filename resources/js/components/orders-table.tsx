@@ -18,6 +18,15 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from "./ui/alert-dialog";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 import { MoreHorizontal } from 'lucide-react';
 import { useOrders } from '@/hooks/use-orders';
 
@@ -27,6 +36,7 @@ type OrdersTableProps = {
     setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
     pageCount: number;
     showPagination?: boolean; // optional if you want to show a spinner
+    setStatusFilter: (data:string)=>void;
 };
 
 
@@ -35,7 +45,8 @@ export const OrdersTable = ({
     pagination,
     setPagination,
     pageCount,
-    showPagination
+    showPagination,
+    setStatusFilter
 }: OrdersTableProps) => {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -77,14 +88,30 @@ export const OrdersTable = ({
     return (
         <>
             <div className="flex justify-between items-center py-4">
-                <Input
-                    placeholder="Filter orders..."
-                    value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
+               <div className="flex gap-4 items-center">
+                 <Input
+                    placeholder="Search orders"
+                    value={(table.getColumn("order_number")?.getFilterValue() as string) ?? ""}
                     onChange={(event) =>
-                        table.getColumn("email")?.setFilterValue(event.target.value)
+                        table.getColumn("order_number")?.setFilterValue(event.target.value)
                     }
                     className="max-w-sm"
                 />
+                 <Select onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                            <SelectLabel>Statuses</SelectLabel>
+                            <SelectItem value="pending">Pending</SelectItem>
+                            <SelectItem value="processing">Processing</SelectItem>
+                            <SelectItem value="completed">Completed</SelectItem>
+                            <SelectItem value="cancelled">Cancelled</SelectItem>
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+               </div>
                 {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
                 <Button className='cursor-pointer' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
 

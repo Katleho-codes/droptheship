@@ -71,11 +71,91 @@ class OrderController extends Controller
         }
     }
 
+    // public function search(Request $request)
+    // {
+    //     $status = $request->string('status');
+    //     $dateRange     = $request->string('date_range'); // format: 2025-09-01:2025-09-13
+    //     $customerEmail = $request->string('customer_email');
+
+    //     $orders = DB::table('orders')
+    //         ->join('customers', 'orders.user_id', '=', 'customers.id')
+    //         ->join('products', 'orders.product_id', '=', 'products.id')
+    //         ->select(
+    //             'orders.*',
+    //             'customers.email as email',
+    //             'customers.first_name as first_name',
+    //             'customers.last_name as last_name',
+    //             'customers.phone as phone',
+    //             'products.name as product_name',
+    //             'products.description as product_description',
+    //             'products.sale_price as price',
+    //             'products.main_image_url as product_image'
+    //         )
+    //         ->when($status, fn($q) => $q->where('orders.status', $status))
+    //           ->when($dateRange, function ($q) use ($dateRange) {
+    //         [$from, $to] = explode(':', $dateRange);
+    //         $q->whereBetween('orders.created_at', [$from, $to]);
+    //     })
+    //         ->when(
+    //             $customerEmail,
+    //             fn($q) =>
+    //             $q->where('customers.email', 'like', "%{$customerEmail}%")
+    //         )
+    //         ->latest('orders.created_at')
+    //         ->paginate(15); // ✅ pagination for frontend tables
+
+    //     return response()->json($orders);
+    // }
+
 
 
     /**
      * Store a newly created resource in storage.
      */
+
+    public function search(Request $request)
+    {
+        $status = $request->string('status');
+        $dateRange = $request->string('date_range'); // format: 2025-09-01:2025-09-13
+        $customerEmail = $request->string('customer_email');
+
+        $orders = DB::table('orders')
+            ->join('customers', 'orders.user_id', '=', 'customers.id')
+            ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(
+                'orders.*',
+                'customers.email as email',
+                'customers.first_name as first_name',
+                'customers.last_name as last_name',
+                'customers.phone as phone',
+                'products.name as product_name',
+                'products.description as product_description',
+                'products.sale_price as price',
+                'products.main_image_url as product_image'
+            )
+            ->when($status, fn($q) => $q->where('orders.status', $status))
+            ->when($dateRange, function ($q) use ($dateRange) {
+                $parts = explode(':', $dateRange);
+
+                if (count($parts) === 2) {
+                    [$from, $to] = $parts;
+                    $q->whereBetween('orders.created_at', [
+                        $from . ' 00:00:00',
+                        $to . ' 23:59:59',
+                    ]);
+                }
+            })
+            ->when(
+                $customerEmail,
+                fn($q) =>
+                $q->where('customers.email', 'like', "%{$customerEmail}%")
+            )
+            ->latest('orders.created_at')
+            ->paginate(15);
+
+        return response()->json($orders);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([

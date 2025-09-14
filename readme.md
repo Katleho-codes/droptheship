@@ -11,7 +11,7 @@
 
 ### 📦 Order Management
 - [x] Add/Delete orders
-- [ ] Order list with filters (status, date, customer)
+- [x] Order list with filters (status)
 - [ ] Auto-order from supplier (via API or browser automation)
 - [ ] Track order fulfillment & status
 - [ ] Export orders to CSV/PDF
