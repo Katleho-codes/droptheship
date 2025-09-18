@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Imports\OrdersImport;
+use App\Exports\OrdersExport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Str;
@@ -71,6 +72,8 @@ class OrderController extends Controller
         }
     }
 
+
+
     // public function search(Request $request)
     // {
     //     $status = $request->string('status');
@@ -113,6 +116,18 @@ class OrderController extends Controller
      * Store a newly created resource in storage.
      */
 
+
+    public function export(Request $request)
+    {
+        $status = $request->input('status');
+        $dateRange = $request->input('date_range');
+        $customerEmail = $request->input('customer_email');
+
+        return Excel::download(
+        new OrdersExport($status, $dateRange, $customerEmail),
+        'orders_' . now()->format('Y-m-d_His') . '.xlsx'
+    );
+    }
     public function search(Request $request)
     {
         $status = $request->string('status');

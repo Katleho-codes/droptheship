@@ -37,6 +37,7 @@ type OrdersTableProps = {
     pageCount: number;
     showPagination?: boolean; // optional if you want to show a spinner
     setStatusFilter: (data:string)=>void;
+    exportFilteredOrders: ()=>void;
 };
 
 
@@ -46,7 +47,7 @@ export const OrdersTable = ({
     setPagination,
     pageCount,
     showPagination,
-    setStatusFilter
+    setStatusFilter,exportFilteredOrders
 }: OrdersTableProps) => {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -113,7 +114,8 @@ export const OrdersTable = ({
                 </Select>
                </div>
                 {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
-                <Button className='cursor-pointer' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
+                <Button className='cursor-pointer' onClick={() => router.visit(route("orders.create"))}>Add Order</Button>
+                <Button className='cursor-pointer' onClick={exportFilteredOrders}>Export orders</Button>
 
             </div>
             <div className="overflow-hidden rounded-md border">

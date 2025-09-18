@@ -16,7 +16,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
- 
+
 
     // products
 
@@ -46,21 +46,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     // orders
     Route::prefix('orders')->group(function () {
- 
+
         Route::get('/create', function () {
             return Inertia::render('orders/create');
         })->name('orders.create');
-           Route::get('/', function () {
-        return Inertia::render('orders/index');
-    })->name('orders.index');
+        Route::get('/', function () {
+            return Inertia::render('orders/index');
+        })->name('orders.index');
         Route::get('/{id}/edit', function ($id) {
             return Inertia::render('orders/edit', ['id' => $id]);
         })->name('orders.edit');
-  // Import users/products via CSV/Excel
+        // Import users/products via CSV/Excel
         Route::post('/import', [OrderController::class, 'import'])
             ->name('orders.import');
+        Route::get('/export', [OrderController::class, 'export'])->name('orders.export');
     });
-
+    // Export orders
 
 });
 

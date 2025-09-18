@@ -14,7 +14,7 @@
 - [x] Order list with filters (status)
 - [ ] Auto-order from supplier (via API or browser automation)
 - [ ] Track order fulfillment & status
-- [ ] Export orders to CSV/PDF
+- [x] Export orders to excel format
 
 ### 🤝 Supplier Integration
 - [ ] Integrate with AliExpress, Zendrop, etc.

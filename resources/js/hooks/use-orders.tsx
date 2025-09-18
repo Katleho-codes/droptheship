@@ -86,6 +86,47 @@ export const useOrders = () => {
     }
   }
 
+  const exportOrders = async (filters: {
+    status?: string;
+    date_range?: string;
+    customer_email?: string;
+  } = {}) => {
+    try {
+      const params = new URLSearchParams({
+        ...(filters.status ? { status: filters.status } : {}),
+        ...(filters.date_range ? { date_range: filters.date_range } : {}),
+        ...(filters.customer_email ? { customer_email: filters.customer_email } : {}),
+      });
+
+      const response = await axios.get(
+        `http://localhost:8000/orders/export?${params.toString()}`,
+        { responseType: "blob" } // 👈 Excel needs blob
+      );
+
+      console.log("export orders response", response);
+      // Try to read filename from Content-Disposition
+      let fileName = "orders.xlsx";
+      const disposition = response.headers["content-disposition"];
+      if (disposition && disposition.includes("filename=")) {
+        const match = disposition.match(/filename="?([^"]+)"?/);
+        if (match?.[1]) {
+          fileName = match[1];
+        }
+      }
+
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = fileName;
+      link.click();
+    } catch (error) {
+      console.error("Export error:", error);
+    }
+  };
+
   // useEffect(() => {
   //   fetchOrders(pagination.pageIndex + 1); // API pages are 1-based, TanStack pages are 0-based
   // }, [pagination.pageIndex]);
@@ -99,7 +140,8 @@ export const useOrders = () => {
     totalRecords,
     deleteOrder,
     deleteOrderLoading,
-    fetchOrders
+    fetchOrders,
+    exportOrders
   };
 };
 
