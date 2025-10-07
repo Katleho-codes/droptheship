@@ -5,7 +5,8 @@ namespace App\Http\Controllers\Customers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Customer;
-// use App\Imports\CustomersImport;
+use App\Imports\CustomersImport;
+use App\Exports\CustomersExport;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -14,10 +15,65 @@ class CustomerController extends Controller
     /**
      * Display a listing of the resource.
      */
+    // public function index()
+    // {
+    //     $customers = Customer::latest()->paginate(10);
+    //     return response()->json($customers);
+    // }
+
     public function index()
     {
         $customers = Customer::latest()->paginate(10);
+
+        $customers->getCollection()->transform(function ($customer) {
+            $customer->created_at = $customer->created_at->format('Y-m-d H:i:s'); // or any format you want
+            return $customer;
+        });
+
         return response()->json($customers);
+    }
+
+    /**
+     * Import a newly created resource in storage.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,csv,txt'
+        ]);
+        try {
+            Excel::import(new CustomersImport, $request->file('file'));
+
+
+            return response()->json([
+                'message' => 'Customers imported successfully.',
+            ], 201);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors occurred.',
+                'errors' => collect($failures)->map(function ($failure) {
+                    return [
+                        'row' => $failure->row(), // row that went wrong
+                        'attr' => $failure->attribute(), // column name
+                        'errors' => $failure->errors(),   // actual error messages
+                        'value' => $failure->values(),   // full row data
+                    ];
+                }),
+            ], 422);
+        }
+    }
+
+    public function export(Request $request)
+    {
+        $dateRange = $request->input('date_range');
+
+        return Excel::download(
+            new CustomersExport($dateRange),
+            'customers_' . now()->format('Y-m-d_His') . '.xlsx'
+        );
     }
 
     /**
@@ -67,6 +123,17 @@ class CustomerController extends Controller
      */
     public function show(Customer $customer)
     {
+        $customer = DB::table('customers')
+            ->join('orders', 'customers.id', '=', 'orders.user_id')
+            ->select(
+                'customers.*',
+                'orders.order_number as order_number',
+                'orders.total_amount as order_total_amount',
+                'orders.created_at as order_created_at',
+                'orders.status as order_status',
+            )
+            ->where('customers.id', $customer->id)
+            ->first();
         return $customer;
     }
 

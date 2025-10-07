@@ -1,14 +1,4 @@
 import { OrdersTable } from '@/components/orders-table';
-import { Input } from '@/components/ui/input';
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectLabel,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { useOrders } from '@/hooks/use-orders';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';

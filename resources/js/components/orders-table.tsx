@@ -89,7 +89,7 @@ export const OrdersTable = ({
     return (
         <>
             <div className="flex justify-between items-center py-4">
-               <div className="flex gap-4 items-center">
+               <div className="flex gap-4 items-center flex-col md:flex-row">
                  <Input
                     placeholder="Search orders"
                     value={(table.getColumn("order_number")?.getFilterValue() as string) ?? ""}
@@ -114,8 +114,10 @@ export const OrdersTable = ({
                 </Select>
                </div>
                 {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
-                <Button className='cursor-pointer' onClick={() => router.visit(route("orders.create"))}>Add Order</Button>
-                <Button className='cursor-pointer' onClick={exportFilteredOrders}>Export orders</Button>
+           <div className='flex items-center gap-4 flex-col-reverse md:flex-row'>
+                 <Button className='cursor-pointer w-full lg:w-auto' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
+                <Button className='cursor-pointer' variant={"outline"} onClick={exportFilteredOrders}>Export orders</Button>
+           </div>
 
             </div>
             <div className="overflow-hidden rounded-md border">

@@ -1,5 +1,5 @@
 
-import { GetProduct } from "@/types";
+import { Customer } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -14,7 +14,8 @@ interface SearchCustomer {
 export const useCustomer = (id?: number | null | unknown, query?: string | null | unknown) => {
     const [customerSearchResults, setCustomerSearchResults] = useState<SearchCustomer[]>([]);
     const [customerSearchLoading, setCustomerSearchLoading] = useState(false);
-
+    const [singleCustomer, setSingleCustomer] = useState<Customer | null>(null)
+    const [fetchSingleCustomerLoading, setFetchSingleCustomerLoading] = useState(false)
     const searchCustomer = async () => {
         if (!query) return;
         try {
@@ -32,6 +33,23 @@ export const useCustomer = (id?: number | null | unknown, query?: string | null 
         }
     };
 
+    const fetchCustomer = async () => {
+        if (!id) return;
+        try {
+            setFetchSingleCustomerLoading(true);
+            const response = await axios.get(`http://localhost:8000/api/customers/${id}`);
+            if (response?.data) {
+                setSingleCustomer(response.data); // just the single product
+                return response.data;
+            }
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setFetchSingleCustomerLoading(false);
+        }
+    };
+
+
     // Fetch single product when ID is set
     useEffect(() => {
         if (query !== null) {
@@ -43,9 +61,20 @@ export const useCustomer = (id?: number | null | unknown, query?: string | null 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [query]);
 
+    // Fetch single customer when ID is set
+    useEffect(() => {
+        if (id !== null) {
+            fetchCustomer();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [id]);
+
+
     return {
         customerSearchResults,
-        customerSearchLoading
+        customerSearchLoading,
+        singleCustomer,
+        fetchSingleCustomerLoading
     };
 };
 

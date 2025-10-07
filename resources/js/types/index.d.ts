@@ -49,7 +49,7 @@ export interface AddProduct {
     cost_price: number;
     sale_price: number;
     stock_quantity: number;
-    status: "active"|"inactive"|"archived";
+    status: 'active' | 'inactive' | 'archived';
     barcode?: string;
     weight_grams?: number;
     supplier_id?: number;
@@ -59,7 +59,7 @@ export interface AddProduct {
 }
 
 export interface GetProduct {
-    id:number;
+    id: number;
     name: string;
     name: string;
     description: string;
@@ -77,17 +77,17 @@ export interface GetProduct {
     address: string;
     state: string;
     postal_code: string;
-notes: string;
-order_number: string;
-email: string;
-first_name: string;
-last_name: string;
-phone: string;
-product_name: string;
-product_description: string;
-price: string;
-product_image: string;
-country?: string;
+    notes: string;
+    order_number: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    phone: string;
+    product_name: string;
+    product_description: string;
+    price: string;
+    product_image: string;
+    country?: string;
     created_at?: string;
     discount?: string;
     barcode?: string;
@@ -98,13 +98,12 @@ country?: string;
     additional_images?: string;
 }
 
-
 export interface Product {
     id: number;
     description?: string;
     cost_price: number;
     sale_price: number;
-    status: "active"|"inactive"|"archived";
+    status: 'active' | 'inactive' | 'archived';
     stock_quantity?: number;
     weight_grams?: number;
     supplier_id?: number;
@@ -116,24 +115,31 @@ export interface Order {
     id: number;
     total_amount: number;
     user_id: number;
-    payment_method?:string;
+    payment_method?: string;
     status?: string;
-    payment_status?:string;
+    payment_status?: string;
     currency?: number;
-   shipping_address_id?: string;
-   billing_address_id?: string;
-   notes?: string;
-   user_email?: string;
+    shipping_address_id?: string;
+    billing_address_id?: string;
+    notes?: string;
+    user_email?: string;
 }
 export interface Supplier {
     id: number;
-    name:string;
-    email:string;
-    address:string;
-    phone?:string; 
+    name: string;
+    email: string;
+    address: string;
+    phone?: string;
 }
-export interface GetCustomer {
-
+export interface Customer {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone: string;
+    order_number?: number;
+    order_created_at?: string;
+    order_status?: string;
 }
 export type ProductsTableProps = {
     data: Product[];

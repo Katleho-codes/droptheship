@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Products\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Orders\OrderController;
@@ -61,7 +62,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
             ->name('orders.import');
         Route::get('/export', [OrderController::class, 'export'])->name('orders.export');
     });
-    // Export orders
+
+    // customers
+    Route::prefix('customers')->group(function () {
+
+        Route::get('/create', function () {
+            return Inertia::render('customers/create');
+        })->name('customers.create');
+        Route::get('/', function () {
+            return Inertia::render('customers/index');
+        })->name('customers.index');
+        Route::get('/{id}/edit', function ($id) {
+            return Inertia::render('customers/edit', ['id' => $id]);
+        })->name('customers.edit');
+        Route::post('/import', [CustomerController::class, 'import'])
+            ->name('customers.import');
+        Route::get('/export', [CustomerController::class, 'export'])->name('customers.export');
+    });
 
 });
 
