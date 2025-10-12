@@ -1,9 +1,11 @@
 import { useCustomer } from '@/hooks/use-customer';
+import { useProduct } from '@/hooks/use-product';
 import { cn } from '@/lib/utils';
 import axios from 'axios';
 import { CheckIcon, ChevronsUpDown } from 'lucide-react';
 import { FormEventHandler, useState } from 'react';
 import { toast } from 'sonner';
+import QuantityCounter from './quantity-counter';
 import { Button } from './ui/button';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from './ui/command';
 import { Input } from './ui/input';
@@ -22,30 +24,49 @@ export default function AddOrderForm() {
   const [total_amount, setTotalAmount] = useState("")
   const [status, setStatus] = useState("");
 
-  const [query, setQuery] = useState('');
+  const [customerSearchQuery, setSearchCustomerQuery] = useState('');
   const [user_id, setUserId] = useState('');
   const [email, setEmail] = useState('');
-  const [openCombobox, setOpenCombobox] = useState(false);
+  const [openCustomerSearchCombobox, setOpenCustomerSearchCombobox] = useState(false);
 
+  const [quantity, setQuantity] = useState(1);
+  const [productSearchQuery, setSearchProductQuery] = useState('');
+  const [product_name, setProductName] = useState("")
+  const [product_id, setProductId] = useState("")
+  const [openProductSearchCombobox, setOpenProductSearchCombobox] = useState(false);
 
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false)
-  const next = () => setStep((s) => Math.min(s + 1, 8));
-  const prev = () => setStep((s) => Math.max(s - 1, 1));
+  // const next = () => setStep((s) => Math.min(s + 1, 10));
+  // const prev = () => setStep((s) => Math.max(s - 1, 1));
+  const next = () => {
+    setLoading(false);
+    setStep((s) => Math.min(s + 1, 9));
+  };
+
+  const prev = () => {
+    setLoading(false);
+    setStep((s) => Math.max(s - 1, 1));
+  };
+
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+
 
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
 
     const fields = {
       "user_id": user_id,
+      "product_id": product_id,
       "currency": currency,
       "payment_method": payment_method,
       "total_amount": total_amount,
       "payment_status": payment_status,
       "notes": notes,
-      "status": status
+      "status": status,
+      "quantity": quantity,
+      "shipping_cost": 0 // todo: when flow makes sense will come back to this, 0 for now since it is required
     }
     console.log(fields)
 
@@ -63,6 +84,7 @@ export default function AddOrderForm() {
         toast(data?.message);
       }
     } catch (error: any) {
+      console.error("add order error", error)
       if (error?.response && error.response.status === 422) {
         setErrors(error?.response.data.errors); // 👈 store backend errors
       }
@@ -72,26 +94,103 @@ export default function AddOrderForm() {
 
   };
 
-  // fetch customers when query changes
+  // fetch customers when customerSearchQuery changes
   const { customerSearchResults,
-    customerSearchLoading } = useCustomer('', query);
+    customerSearchLoading } = useCustomer('', customerSearchQuery);
 
-  console.log("customerSearchResults", customerSearchResults)
-  console.log("user_id", user_id)
+  const { productSearchResults,
+    productSearchLoading } = useProduct('', productSearchQuery);
+
+
 
   return (
     <form onSubmit={handleSubmit}>
       {
         step === 1 && (
           <div className='w-full'>
-            <Label className="block font-medium mb-1">Name</Label>
+            <Label className="block font-medium mb-1">Product name</Label>
 
-            <Popover open={openCombobox} onOpenChange={setOpenCombobox}>
+            <Popover open={openProductSearchCombobox} onOpenChange={setOpenProductSearchCombobox}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
                   role="combobox"
-                  aria-expanded={openCombobox}
+                  aria-expanded={openProductSearchCombobox}
+                  className="w-full justify-between"
+                >
+                  {product_name
+                    ? (() => {
+                      const product = productSearchResults?.find(c => c.name === product_name);
+                      return product
+                        ? `${product.name}`
+                        : "Select product...";
+                    })()
+                    : "Select product..."}
+
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0">
+                <Command>
+                  <CommandInput placeholder="Search product name..." className="h-9" value={productSearchQuery}
+                    onValueChange={setSearchProductQuery} />
+                  <CommandList>
+                    <CommandEmpty>No product found.</CommandEmpty>
+                    <CommandGroup>
+                      {productSearchResults?.map((x) => (
+                        <CommandItem
+
+                          key={x.id}
+                          value={x.name}
+                          onSelect={(currentValue) => {
+                            console.log("currentValue", currentValue)
+                            setProductName(x.name)
+                            setProductId(x?.id?.toString()); // Store the corresponding repairshopr ID
+                            setOpenProductSearchCombobox(false)
+                          }}
+                        >
+                          <div className="flex flex-col">
+                            <span className="font-medium">{x.name} {x.sale_price}</span>
+                            <span className="text-xs text-muted-foreground">{x.sku} {x.status}</span>
+                          </div>
+                          <CheckIcon
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              product_name === x.name ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+        )
+      }
+      {
+        step == 2 && (
+          <div className="w-full">
+            <Label className="block font-medium mb-1">Quantity</Label>
+            <QuantityCounter initialValue={quantity} onChange={setQuantity} />
+            {errors.quantity && (
+              <p className="text-red-500 text-sm">{errors.quantity[0]}</p>
+            )}
+          </div>
+        )
+      }
+      {
+        step === 3 && (
+          <div className='w-full'>
+            <Label className="block font-medium mb-1">Customer name</Label>
+
+            <Popover open={openCustomerSearchCombobox} onOpenChange={setOpenCustomerSearchCombobox}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openCustomerSearchCombobox}
                   className="w-full justify-between"
                 >
                   {email
@@ -108,8 +207,8 @@ export default function AddOrderForm() {
               </PopoverTrigger>
               <PopoverContent className="w-full p-0">
                 <Command>
-                  <CommandInput placeholder="Search customer email..." className="h-9" value={query}
-                    onValueChange={setQuery} />
+                  <CommandInput placeholder="Search customer email..." className="h-9" value={customerSearchQuery}
+                    onValueChange={setSearchCustomerQuery} />
                   <CommandList>
                     <CommandEmpty>No customer found.</CommandEmpty>
                     <CommandGroup>
@@ -122,7 +221,7 @@ export default function AddOrderForm() {
                             console.log("currentValue", currentValue)
                             setEmail(x.email)
                             setUserId(x?.id?.toString()); // Store the corresponding repairshopr ID
-                            setOpenCombobox(false)
+                            setOpenCustomerSearchCombobox(false)
                           }}
                         >
                           <div className="flex flex-col">
@@ -146,7 +245,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 2 && (
+        step === 4 && (
           <div>
             <Label className="block font-medium mb-1">Payment method</Label>
             <Select value={payment_method} onValueChange={setPaymentMethod}>
@@ -169,7 +268,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 3 && (
+        step === 5 && (
           <div>
             <Label className="block font-medium mb-1">Status</Label>
             <Select value={status} onValueChange={setStatus}>
@@ -192,7 +291,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 4 && (
+        step === 6 && (
           <div>
             <Label className="block font-medium mb-1">Payment status</Label>
             <Select value={payment_status} onValueChange={setPaymentStatus}>
@@ -215,7 +314,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 5 && (
+        step === 7 && (
           <div>
             <Label className="block font-medium mb-1">Amount</Label>
             <Input
@@ -232,7 +331,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 6 && (
+        step === 8 && (
           <div>
             <Label className="block font-medium mb-1">Currency</Label>
             <Select value={currency} onValueChange={setCurrency}>
@@ -255,7 +354,7 @@ export default function AddOrderForm() {
         )
       }
       {
-        step === 7 && (
+        step === 9 && (
           <div className="md:col-span-2">
             <Label className="block font-medium mb-1">Notes</Label>
             <Textarea
@@ -285,7 +384,7 @@ export default function AddOrderForm() {
           <span />
         )}
 
-        {step < 7 ? (
+        {step < 9 ? (
           <Button
             type='button'
             onClick={next}
@@ -297,7 +396,6 @@ export default function AddOrderForm() {
           <Button
             type='submit'
             className="cursor-pointer"
-            disabled={!status}
           >
             {loading ? "Saving..." : "Save"}
           </Button>

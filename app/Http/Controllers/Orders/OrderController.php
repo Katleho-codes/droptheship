@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Orders;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Order;
+use App\Models\Customer;
 use App\Imports\OrdersImport;
 use App\Exports\OrdersExport;
 use Illuminate\Support\Facades\DB;
@@ -85,9 +86,9 @@ class OrderController extends Controller
         $customerEmail = $request->input('customer_email');
 
         return Excel::download(
-        new OrdersExport($status, $dateRange, $customerEmail),
-        'orders_' . now()->format('Y-m-d_His') . '.xlsx'
-    );
+            new OrdersExport($status, $dateRange, $customerEmail),
+            'orders_' . now()->format('Y-m-d_His') . '.xlsx'
+        );
     }
     public function search(Request $request)
     {
@@ -143,7 +144,7 @@ class OrderController extends Controller
             'discount' => 'nullable|numeric|min:1',
             'shipping_cost' => 'required|numeric|min:0',
             'color' => 'nullable|string',
-            'cancel_order' => 'required|boolean',
+            'cancel_order' => ['boolean'],
             'currency' => 'nullable|string|size:3',
             'payment_method' => 'nullable|string|max:50',
             'payment_status' => 'nullable|string|max:20',
@@ -154,23 +155,21 @@ class OrderController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        // Step 1: create the order without order_number
-        $order = Order::create($validated);
+        // Generate unique order_number before creating record
+        do {
+            $orderNumber = 'ORD-' . strtoupper(Str::random(8));
+        } while (Order::where('order_number', $orderNumber)->exists());
 
-        // Step 2: generate order number using the assigned ID
-        // $order->order_number = 'ORD-' . str_pad($order->id, 5, '0', STR_PAD_LEFT);
-        $order->order_number = 'ORD-' . strtoupper(Str::random(8));
-        while (Order::where('order_number', $order->order_number)->exists()) {
-            $order->order_number = 'ORD-' . strtoupper(Str::random(8));
-        }
-        $order->save();
-        // ORD-9F2D4A1B
+        $validated['order_number'] = $orderNumber;
+
+        $order = Order::create($validated);
 
         return response()->json([
             'message' => 'Order created successfully',
-            'order' => $order
+            'order' => $order,
         ], 201);
     }
+
 
 
     /**
@@ -196,6 +195,31 @@ class OrderController extends Controller
             ->first();
 
         return $order;
+    }
+    // find customer
+
+    // this will find the customer's previous orders
+    public function findPrevCustomerOrders(Customer $customer)
+    {
+        $orders = DB::table('orders')
+            ->join('customers', 'orders.user_id', '=', 'customers.id')
+            // ->join('products', 'orders.product_id', '=', 'products.id')
+            ->select(
+                'orders.*',
+                'customers.email as email',
+                'customers.first_name as first_name',
+                'customers.last_name as last_name',
+                'customers.phone as phone',
+                // 'products.name as product_name',
+                // 'products.description as product_description',
+                // 'products.sale_price as price',
+                // 'products.main_image_url as product_image'
+            )
+            ->where('customers.id', $customer->id)
+            ->orderByDesc('orders.created_at')
+            ->get(); // fetch all
+
+        return response()->json($orders);
     }
 
     /**

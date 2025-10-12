@@ -25,13 +25,19 @@ class CustomerController extends Controller
     {
         $customers = Customer::latest()->paginate(10);
 
-        $customers->getCollection()->transform(function ($customer) {
-            $customer->created_at = $customer->created_at->format('Y-m-d H:i:s'); // or any format you want
-            return $customer;
-        });
+        // convert collection to array with formatted dates
+        $customers->setCollection(
+            $customers->getCollection()->transform(function ($customer) {
+                $customer->created_at = $customer->created_at->format('Y-m-d H:i:s');
+                $customer->updated_at = $customer->updated_at->format('Y-m-d H:i:s');
+                return $customer;
+            })
+        );
 
         return response()->json($customers);
     }
+
+
 
     /**
      * Import a newly created resource in storage.

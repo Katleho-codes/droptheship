@@ -61,7 +61,7 @@ export const ProductsTable = ({
                     className="max-w-sm"
                 />
                 {/* <Button className='cursor-pointer' onClick={()=>router.visit(route("products.create"))}>Add product</Button> */}
-                <Button className='cursor-pointer' onClick={() =>  setOpenAddProductModal(true)}>Add product</Button>
+                <Button className='cursor-pointer' onClick={() => setOpenAddProductModal(true)}>Add product</Button>
 
             </div>
             <div className="overflow-hidden rounded-md border">

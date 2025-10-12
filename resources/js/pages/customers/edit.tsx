@@ -26,7 +26,7 @@ const Edit = () => {
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={`${singleCustomer?.first_name ?? "View customer"}`} />
 
-     
+
     </AppLayout>
   );
 };

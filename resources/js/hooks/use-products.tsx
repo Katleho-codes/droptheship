@@ -16,10 +16,24 @@ export const useProducts = () => {
   const [pageCount, setPageCount] = useState<number>(0);
   const [totalRecords, setTotalRecords] = useState<number>(0);
 
-  const fetchProducts = async (page: number) => {
+  const fetchProducts = async (page: number,
+    filters: {
+      product_name?: string;
+    } = {}) => {
     try {
       setProductsLoading(true);
-      const response = await axios.get(`http://localhost:8000/api/products?page=${page}`);
+
+      const params = new URLSearchParams({
+        page: String(page),
+        ...(filters.product_name ? { name: filters.product_name } : {}),
+      });
+
+   const hasFilters = Object.values(filters).some(Boolean);
+      const url = hasFilters
+        ? `http://localhost:8000/api/products/search?${params.toString()}`
+        : `http://localhost:8000/api/products?page=${page}`;
+
+      const response = await axios.get(url);
       if (response?.data) {
         const { data, last_page, total } = response.data;
         setProducts(data);

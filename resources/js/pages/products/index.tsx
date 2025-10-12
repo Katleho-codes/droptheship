@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Head } from '@inertiajs/react';
@@ -12,16 +12,17 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 const Products = () => {
-        const { products, pagination, setPagination, pageCount } = useProducts();
-    
+    const { products, pagination, setPagination, pageCount, fetchProducts } = useProducts();
+
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Products" />
-                <div className="w-full mx-auto py-2 px-3">
-                            <ProductsTable data={products} pagination={pagination}
-                                setPagination={setPagination}
-                                pageCount={pageCount} showPagination={true}/>
-                        </div>
+            <div className="w-full mx-auto py-2 px-3">
+                <ProductsTable data={products}
+                    pagination={pagination}
+                    setPagination={setPagination}
+                    pageCount={pageCount} showPagination={true} />
+            </div>
         </AppLayout>
 
     )

@@ -84,6 +84,22 @@ class ProductController extends Controller
         ], 201);
     }
 
+        public function search(Request $request)
+    {
+        $q = $request->string('q');
+
+        $product = Product::query()
+            ->when(
+                $q,
+                fn($builder) =>
+                $builder->where('name', 'like', "%{$q}%")
+            )
+            ->limit(10)
+            ->get(['id', 'name', 'description', 'sku', 'barcode', 'cost_price', 'sale_price', 'stock_quantity', 'weight_grams', 'status']);
+
+        return response()->json($product);
+    }
+
     /**
      * Display the specified resource.
      */
