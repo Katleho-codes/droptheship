@@ -127,21 +127,46 @@ class CustomerController extends Controller
     /**
      * Display the specified resource.
      */
+    // public function show(Customer $customer)
+    // {
+    //     $customer = DB::table('customers')
+    //         ->join('orders', 'customers.id', '=', 'orders.user_id')
+    //         ->select(
+    //             'customers.*',
+    //             'orders.order_number as order_number',
+    //             'orders.total_amount as order_total_amount',
+    //             'orders.created_at as order_created_at',
+    //             'orders.status as order_status',
+    //         )
+    //         ->where('customers.id', $customer->id)
+    //         ->first();
+    //     return $customer;
+    // }
     public function show(Customer $customer)
     {
-        $customer = DB::table('customers')
-            ->join('orders', 'customers.id', '=', 'orders.user_id')
-            ->select(
-                'customers.*',
-                'orders.order_number as order_number',
-                'orders.total_amount as order_total_amount',
-                'orders.created_at as order_created_at',
-                'orders.status as order_status',
-            )
-            ->where('customers.id', $customer->id)
+        $orders = DB::table('orders')
+            ->where('orders.user_id', $customer->id)
+            ->orderBy('orders.created_at', 'desc')
+            ->limit(10)
+            ->get([
+                'orders.id',
+                'orders.order_number',
+                'orders.total_amount',
+                'orders.status',
+                'orders.created_at',
+            ]);
+
+        $customerData = DB::table('customers')
+            ->where('id', $customer->id)
             ->first();
-        return $customer;
+
+        // Combine customer info with recent orders
+        return response()->json([
+            'customer' => $customerData,
+            'recent_orders' => $orders,
+        ]);
     }
+
 
     /**
      * Update the specified resource in storage.

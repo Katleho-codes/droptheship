@@ -137,10 +137,25 @@ export interface Customer {
     last_name: string;
     email: string;
     phone: string;
+    address: string;
+    city?: string;
+    state?: string;
+    postal_code?: string;
+    country?: string;
     order_number?: number;
     order_created_at?: string;
     order_status?: string;
+
+    // recent_orders?: Array<{ id: string; order_number: string; total_amount: string; status: string; created_at: string }> | any[];
 }
+export interface CustomerRecentOrders {
+    id: string;
+    order_number: string;
+    total_amount: string;
+    status: string;
+    created_at: string;
+}
+
 export type ProductsTableProps = {
     data: Product[];
     pagination: PaginationState;

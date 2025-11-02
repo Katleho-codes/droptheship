@@ -17,23 +17,6 @@ export const useOrders = () => {
   const [totalRecords, setTotalRecords] = useState<number>(0);
   const [deleteOrderLoading, setDeleteOrderLoading] = useState(false)
 
-  // const fetchOrders = async (page: number,) => {
-  //   try {
-  //     setOrdersLoading(true);
-  //     const response = await axios.get(`http://localhost:8000/api/orders?page=${page}`);
-  //     if (response?.data) {
-  //       const { data, last_page, total } = response.data;
-  //       console.log("orders ", data)
-  //       setOrders(data);
-  //       setPageCount(last_page);
-  //       setTotalRecords(total);
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   } finally {
-  //     setOrdersLoading(false);
-  //   }
-  // };
   const fetchOrders = async (
     page: number,
     filters: {

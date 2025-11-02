@@ -68,7 +68,6 @@ export default function AddOrderForm() {
       "quantity": quantity,
       "shipping_cost": 0 // todo: when flow makes sense will come back to this, 0 for now since it is required
     }
-    console.log(fields)
 
     try {
       setLoading(true);
@@ -79,12 +78,10 @@ export default function AddOrderForm() {
           "Accept": "application/json"
         }
       });
-      console.log("Created order:", data);
       if (data?.success === true) {
         toast(data?.message);
       }
     } catch (error: any) {
-      console.error("add order error", error)
       if (error?.response && error.response.status === 422) {
         setErrors(error?.response.data.errors); // 👈 store backend errors
       }

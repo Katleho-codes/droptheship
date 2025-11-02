@@ -13,16 +13,16 @@ const Customers = () => {
     const [statusFilter, setStatusFilter] = useState<string>("");
     const [customerEmailFilter, setCustomerEmailFilter] = useState<string>("");
 
-    const {  customers,
-    customersLoading,
-    pagination,
-    setPagination,
-    pageCount,
-    totalRecords,
-    deleteCustomer,
-    deleteCustomerLoading,
-    fetchCustomers,
-    exportCustomers } = useCustomers();
+    const { customers,
+        customersLoading,
+        pagination,
+        setPagination,
+        pageCount,
+        totalRecords,
+        deleteCustomer,
+        deleteCustomerLoading,
+        fetchCustomers,
+        exportCustomers } = useCustomers();
 
 
     const date_range = dateFrom && dateTo ? `${dateFrom}:${dateTo}` : "";

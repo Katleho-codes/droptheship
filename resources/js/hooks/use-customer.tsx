@@ -1,5 +1,5 @@
 
-import { Customer } from "@/types";
+import { Customer, CustomerRecentOrders } from "@/types";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
@@ -14,7 +14,8 @@ interface SearchCustomer {
 export const useCustomer = (id?: number | null | unknown, query?: string | null | unknown) => {
     const [customerSearchResults, setCustomerSearchResults] = useState<SearchCustomer[]>([]);
     const [customerSearchLoading, setCustomerSearchLoading] = useState(false);
-    const [singleCustomer, setSingleCustomer] = useState<Customer | null>(null)
+    const [singleCustomer, setSingleCustomer] = useState<Customer>({})
+    const [singleCustomerRecentOrders, setSingleCustomerRecentOrders] = useState<CustomerRecentOrders>([])
     const [fetchSingleCustomerLoading, setFetchSingleCustomerLoading] = useState(false)
     const searchCustomer = async () => {
         if (!query) return;
@@ -22,7 +23,6 @@ export const useCustomer = (id?: number | null | unknown, query?: string | null 
             setCustomerSearchLoading(true);
             const response = await axios.get(`http://localhost:8000/api/customers/search?q=${encodeURIComponent(query)}`);
             if (response?.data) {
-                console.log("search customer result", response.data)
                 setCustomerSearchResults(response.data); // just the single product
                 return response.data;
             }
@@ -39,7 +39,10 @@ export const useCustomer = (id?: number | null | unknown, query?: string | null 
             setFetchSingleCustomerLoading(true);
             const response = await axios.get(`http://localhost:8000/api/customers/${id}`);
             if (response?.data) {
-                setSingleCustomer(response.data); // just the single product
+                const { customer, recent_orders } = response.data;
+                // console.log("fetchCustomer", response.data)
+                setSingleCustomer(customer);
+                setSingleCustomerRecentOrders(recent_orders);
                 return response.data;
             }
         } catch (error) {
@@ -74,6 +77,7 @@ export const useCustomer = (id?: number | null | unknown, query?: string | null 
         customerSearchResults,
         customerSearchLoading,
         singleCustomer,
+        singleCustomerRecentOrders,
         fetchSingleCustomerLoading
     };
 };

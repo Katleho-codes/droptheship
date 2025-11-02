@@ -166,7 +166,6 @@ class OrderController extends Controller
 
         return response()->json([
             'message' => 'Order created successfully',
-            'order' => $order,
         ], 201);
     }
 
@@ -240,7 +239,6 @@ class OrderController extends Controller
         $order->update($validated);
         return response()->json([
             'message' => 'Order updated successfully',
-            'order' => $order
         ], 200);
     }
 

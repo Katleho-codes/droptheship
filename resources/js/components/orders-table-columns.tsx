@@ -4,7 +4,7 @@ import { ArrowUpDown } from 'lucide-react';
 import { Button } from "./ui/button";
 
 const columns: ColumnDef<Order>[] = [
-     {
+    {
         id: "actions",
         enableHiding: false,
     },
@@ -21,7 +21,8 @@ const columns: ColumnDef<Order>[] = [
                 </Button>
             )
         },
-        cell: ({ row }) => <div className="font-medium">{row.getValue("order_number")}</div>
+        // cell: ({ row }) => <div className="font-medium">{row.getValue("order_number")}</div>
+
     },
     {
         accessorKey: "created_at",
@@ -70,7 +71,7 @@ const columns: ColumnDef<Order>[] = [
     },
     {
         accessorKey: "total_amount",
-             header: ({ column }) => {
+        header: ({ column }) => {
             return (
                 <Button
                     variant="ghost"
