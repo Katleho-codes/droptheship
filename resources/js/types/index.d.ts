@@ -79,6 +79,7 @@ export interface GetProduct {
     postal_code: string;
     notes: string;
     order_number?: string;
+    customer_id?: string | number;
     email?: string;
     first_name?: string;
     last_name?: string;

@@ -4,6 +4,7 @@ use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\Products\ProductController;
 use App\Http\Controllers\Suppliers\SupplierController;
+use App\Http\Controllers\Notes\InternalNotesController;
 
 // custom search routes first
 Route::get('/orders/search', [OrderController::class, 'search']);
@@ -16,7 +17,10 @@ Route::apiResource('products', ProductController::class);
 Route::apiResource('suppliers', SupplierController::class);
 Route::apiResource('customers', CustomerController::class);
 Route::get('/customer-prev-orders/{customerId}', [OrderController::class, 'findPrevCustomerOrders']);
+Route::apiResource('notes', InternalNotesController::class);
 
+// custom extra notes endpoint
+Route::get('notes/order/{orderId}', [InternalNotesController::class, 'findTicketNotes']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';

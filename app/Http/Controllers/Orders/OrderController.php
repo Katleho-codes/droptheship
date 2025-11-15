@@ -40,6 +40,9 @@ class OrderController extends Controller
         return response()->json($orders);
     }
 
+
+
+
     /**
      * Import a newly created resource in storage.
      */
@@ -182,6 +185,7 @@ class OrderController extends Controller
             ->select(
                 'orders.*',
                 'customers.email as email',
+                'customers.id as customer_id',
                 'customers.first_name as first_name',
                 'customers.last_name as last_name',
                 'customers.phone as phone',

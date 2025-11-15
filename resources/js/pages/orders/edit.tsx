@@ -1,8 +1,13 @@
 import { useOrder } from '@/hooks/use-order'
-import React from 'react'
-import { usePage,Head } from '@inertiajs/react';
+import React, { useEffect, useState } from 'react'
+import { usePage, Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { useInternalNotes } from '@/hooks/use-internal-notes';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
 
 const breadcrumbs = [
   { title: "Orders", href: "/orders" },
@@ -13,6 +18,57 @@ const Edit = () => {
   const { props } = usePage();
   const { id } = props;
   const { order, orderLoading } = useOrder(id);
+
+  const [addNote, setAddNote] = useState("")
+  const [noteType, setNoteType] = useState("")
+  const [addNoteLoading, setAddNoteLoading] = useState(false)
+  const [isPrivateNote, setIsPrivateNote] = useState("")
+  const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+
+  const {
+    internalNotes,
+    internalNotesLoading,
+    pagination,
+    setPagination,
+    fetchNotes,
+    pageCount,
+    totalRecords,
+  } = useInternalNotes();
+
+  useEffect(() => {
+    fetchNotes(id as string, pagination.pageIndex + 1);
+  }, [id, pagination]);
+
+  const submitNote = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    try {
+      setAddNoteLoading(true)
+      setErrors({});
+      const payload = { 'order_id': Number(id), 'customer_id': order?.customer_id, "note": addNote, 'note_type': noteType, 'pinned': false, 'is_private': Boolean(isPrivateNote), "attachment_url": "" }
+      const response = await axios.post("http://localhost:8000/api/notes", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        }
+      })
+      if (response?.data) {
+        toast.success(response.data?.message);
+        setAddNote("")
+        setNoteType("")
+        setIsPrivateNote("")
+      }
+
+    } catch (error: any) {
+      console.error("error", error);
+      if (error?.response && error.response.status === 422) {
+        setErrors(error?.response.data.errors);
+      }
+    } finally {
+      setAddNoteLoading(false)
+    }
+  }
+
 
   if (orderLoading) {
     return (
@@ -36,11 +92,10 @@ const Edit = () => {
               Order #{order?.order_number}
             </h1>
             <span
-              className={`px-3 py-1 rounded-full text-sm font-medium ${
-                order?.status === "completed"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-yellow-100 text-yellow-700"
-              }`}
+              className={`px-3 py-1 rounded-full text-sm font-medium ${order?.status === "completed"
+                ? "bg-green-100 text-green-700"
+                : "bg-yellow-100 text-yellow-700"
+                }`}
             >
               {order?.status}
             </span>
@@ -83,7 +138,7 @@ const Edit = () => {
         </div>
 
         {/* Customer Details */}
-        <div className="bg-white shadow rounded p-6">
+        <div className="bg-white shadow rounded p-6 mb-8">
           <h3 className="text-lg font-semibold text-gray-800 mb-4">
             Customer Information
           </h3>
@@ -104,6 +159,85 @@ const Edit = () => {
             </div>
           </div>
         </div>
+
+        {/* Comment details */}
+        <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Internal notes
+        </h3>
+        <div className="mt-4 flex flex-col gap-2 mb-8">
+          <select name="note_type" className='border' id="note_type" value={noteType} onChange={(e) => setNoteType(e.target.value)}>
+            <option value="" disabled>Select note type</option>
+            <option value="email">email</option>
+            <option value="note">note</option>
+            <option value="followup">followup</option>
+            <option value="issue">issue</option>
+          </select>
+          <select name="is_private" className='border' id="is_private" value={isPrivateNote} onChange={(e) => setIsPrivateNote(e.target.value)}>
+            <option value="" disabled>Private/public note</option>
+            <option value="true">True</option>
+            <option value="false">False</option>
+          </select>
+          <Textarea
+            placeholder="Write a note..."
+            value={addNote}
+            onChange={(e) => setAddNote(e.target.value)}
+          />
+          <Button onClick={submitNote} disabled={addNoteLoading}>{addNoteLoading ? 'Adding...' : 'Add note'}</Button>
+        </div>
+        <div className="space-y-2">
+          {internalNotes.length > 0 ? (
+            // Sort pinned notes first, then map
+            internalNotes
+              .sort((a, b) => Number(b.pinned) - Number(a.pinned))
+              .map((note) => (
+                <div
+                  key={note.id}
+                  className={`p-3 border rounded-md shadow-sm ${note.pinned ? "border-yellow-400 bg-yellow-50" : "border-gray-200"
+                    }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <div className="flex flex-col">
+                      <p className="text-gray-800">{note.note}</p>
+                      <small className="text-gray-500 mt-1">
+                        {note.created_at} • {note.note_type}
+                      </small>
+                    </div>
+                    {note.pinned && (
+                      <span className="text-yellow-600 font-bold">📌 Pinned</span>
+                    )}
+                  </div>
+                </div>
+              ))
+          ) : (
+            <p className="text-gray-500 text-sm">No notes yet.</p>
+          )}
+        </div>
+
+
+        <div className="flex gap-2 mt-4">
+          <Button
+            disabled={pagination.pageIndex === 0}
+            onClick={() =>
+              setPagination((p) => ({ ...p, pageIndex: p.pageIndex - 1 }))
+            }
+          >
+            Previous
+          </Button>
+
+          <span>
+            Page {pagination.pageIndex + 1} of {pageCount}
+          </span>
+
+          <Button
+            disabled={pagination.pageIndex + 1 >= pageCount}
+            onClick={() =>
+              setPagination((p) => ({ ...p, pageIndex: p.pageIndex + 1 }))
+            }
+          >
+            Next
+          </Button>
+        </div>
+
       </div>
     </AppLayout>
   );
