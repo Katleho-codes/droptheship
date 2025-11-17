@@ -8,6 +8,8 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 const breadcrumbs = [
   { title: "Orders", href: "/orders" },
@@ -22,7 +24,7 @@ const Edit = () => {
   const [addNote, setAddNote] = useState("")
   const [noteType, setNoteType] = useState("")
   const [addNoteLoading, setAddNoteLoading] = useState(false)
-  const [isPrivateNote, setIsPrivateNote] = useState("")
+  const [isPrivateNote, setIsPrivateNote] = useState(false)
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
 
@@ -45,7 +47,14 @@ const Edit = () => {
     try {
       setAddNoteLoading(true)
       setErrors({});
-      const payload = { 'order_id': Number(id), 'customer_id': order?.customer_id, "note": addNote, 'note_type': noteType, 'pinned': false, 'is_private': Boolean(isPrivateNote), "attachment_url": "" }
+      // Enforce rules
+      const isEmail = noteType === "email";
+      const payload = {
+        'order_id': Number(id), 'customer_id': order?.customer_id, "note": addNote, 'note_type': noteType, 'pinned': false,
+        // Email notes can NEVER be private
+        is_private: isEmail ? false : Boolean(isPrivateNote),
+        "attachment_url": ""
+      }
       const response = await axios.post("http://localhost:8000/api/notes", payload, {
         headers: {
           "Content-Type": "application/json",
@@ -56,7 +65,6 @@ const Edit = () => {
         toast.success(response.data?.message);
         setAddNote("")
         setNoteType("")
-        setIsPrivateNote("")
       }
 
     } catch (error: any) {
@@ -68,7 +76,7 @@ const Edit = () => {
       setAddNoteLoading(false)
     }
   }
-
+ 
 
   if (orderLoading) {
     return (
@@ -172,11 +180,26 @@ const Edit = () => {
             <option value="followup">followup</option>
             <option value="issue">issue</option>
           </select>
-          <select name="is_private" className='border' id="is_private" value={isPrivateNote} onChange={(e) => setIsPrivateNote(e.target.value)}>
-            <option value="" disabled>Private/public note</option>
-            <option value="true">True</option>
-            <option value="false">False</option>
-          </select>
+          <div className="flex items-center justify-between bg-gray-50 p-3 rounded-lg border">
+            <div className="space-y-1">
+              <Label htmlFor="private-note" className="text-sm font-medium text-gray-800">
+                Private Note
+              </Label>
+
+              <p className="text-xs text-gray-500">
+                {isPrivateNote
+                  ? "Only the internal team will see this note. The customer will NOT receive it."
+                  : "This note will be visible to the internal team and the customer. The customer will receive it via email."
+                }
+              </p>
+            </div>
+
+            <Switch
+              id="private-note"
+              checked={isPrivateNote}
+              onCheckedChange={setIsPrivateNote}
+            />
+          </div>
           <Textarea
             placeholder="Write a note..."
             value={addNote}

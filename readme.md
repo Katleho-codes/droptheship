@@ -28,7 +28,7 @@
 
 - [x] Customer profiles
 - [x] Order history
-- [ ] Internal notes / communication log
+- [x] Internal notes / communication log
 - [ ] Customer segmentation
 
 ---

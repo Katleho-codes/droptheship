@@ -5,7 +5,12 @@ namespace App\Http\Controllers\Notes;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
+use App\Mail\InternalNoteMail;
+use App\Models\Customer;
+use App\Models\Order;
 use App\Models\InternalNotes;
+use App\Models\User;
+use Illuminate\Support\Facades\Mail;
 
 class InternalNotesController extends Controller
 {
@@ -52,6 +57,20 @@ class InternalNotesController extends Controller
 
         // Create the note
         $note = InternalNotes::create($validated);
+
+
+        // If note is NOT private → send customer email
+        if (!$validated['is_private']) {
+            $customer = Customer::find($validated['customer_id']);
+            $order = Order::find($validated['order_id']);
+
+            Mail::to($customer->email)
+                ->send(new InternalNoteMail(
+                    note: $validated['note'],
+                    customer: $customer->first_name . " " .  $customer->last_name,
+                    order_id: $order->order_number,
+                ));
+        }
 
         return response()->json([
             'message' => 'Note created successfully',
