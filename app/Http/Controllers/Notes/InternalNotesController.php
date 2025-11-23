@@ -61,8 +61,8 @@ class InternalNotesController extends Controller
 
         // If note is NOT private → send customer email
         if (!$validated['is_private']) {
-            $customer = Customer::find($validated['customer_id']);
-            $order = Order::find($validated['order_id']);
+            $customer = Customer::findOrFail($validated['customer_id']);
+            $order = Order::findOrFail($validated['order_id']);
 
             Mail::to($customer->email)
                 ->send(new InternalNoteMail(

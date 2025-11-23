@@ -125,6 +125,33 @@ export interface Order {
     notes?: string;
     user_email?: string;
 }
+export interface Return {
+    id: number;
+    order_id: number;
+    customer_id: number;
+    reason: string;
+    status: string;
+    preferred_resolution: string;
+    refund_amount: number;
+    refund_method: string;
+    gateway_refund_id: string;
+    payment_id: string;
+    return_tracking_number?: string;
+}
+export interface GetReturn {
+    id: number;
+    order_number: string;
+    email: string;
+    first_name: string;
+    last_name: string;
+    reason: string;
+    status: string;
+    preferred_resolution: string;
+    refund_amount: number;
+    refund_method: string;
+}
+
+
 export interface Supplier {
     id: number;
     name: string;

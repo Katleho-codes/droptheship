@@ -5,6 +5,7 @@ use App\Http\Controllers\Products\ProductController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\Returns\ReturnController;
 use Inertia\Inertia;
 
 // Route::get('/', function () {
@@ -80,6 +81,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/export', [CustomerController::class, 'export'])->name('customers.export');
     });
 
+    // returns
+    Route::prefix('returns')->group(function () {
+
+        Route::get('/create', function () {
+            return Inertia::render('returns/create');
+        })->name('returns.create');
+        Route::get('/', function () {
+            return Inertia::render('returns/index');
+        })->name('returns.index');
+        Route::get('/{id}/edit', function ($id) {
+            return Inertia::render('returns/edit', ['id' => $id]);
+        })->name('returns.edit');
+        Route::post('/import', [ReturnController::class, 'import'])
+            ->name('returns.import');
+        Route::get('/export', [ReturnController::class, 'export'])->name('returns.export');
+    });
 });
 
 

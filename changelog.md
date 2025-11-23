@@ -5,12 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-11-23
+
+### Added
+
+- added 'Returns' for refund processing
+- api and web route for 'Returns'
+- migration for 'Returns'
+- index, edit (view), and create pages for 'Returns' (partially done)
+
+## [Unreleased] - 2025-11-21
+
+### Added
+
+- findOrFail on Customer and Order when sending an internal note mail
+
 ## [Unreleased] - 2025-11-17
 
 ### Added
 
 - When note is set to 'email', send mail with customer with order update
-
 
 ## [Unreleased] - 2025-11-15
 

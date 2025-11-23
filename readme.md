@@ -14,15 +14,8 @@
 
 - [x] Add/Delete orders
 - [x] Order list with filters (status)
-- [ ] Auto-order from supplier (via API or browser automation)
 - [ ] Track order fulfillment & status
 - [x] Export orders to excel format
-
-### 🤝 Supplier Integration
-
-- [ ] Integrate with AliExpress, Zendrop, etc.
-- [ ] Product import from supplier
-- [ ] Auto place orders (optional: Puppeteer/Laravel Dusk for non-API sources)
 
 ### 👤 Customer Management
 

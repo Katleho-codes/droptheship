@@ -4,7 +4,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ShoppingCart, ReceiptText, UsersRound } from 'lucide-react';
+import { ShoppingCart, ReceiptText, UsersRound, BanknoteIcon, RotateCcwSquare } from 'lucide-react';
 import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
@@ -22,6 +22,11 @@ const mainNavItems: NavItem[] = [
         title: 'Customers',
         href: '/customers',
         icon: UsersRound,
+    },
+    {
+        title: 'Returns',
+        href: '/returns',
+        icon: RotateCcwSquare,
     },
 ];
 
