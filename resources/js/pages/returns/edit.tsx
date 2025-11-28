@@ -1,9 +1,14 @@
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useOrderReturn } from '@/hooks/use-order-return';
 import { useReturns } from '@/hooks/use-returns';
 import AppLayout from '@/layouts/app-layout';
+import { returnOrderStatuses } from '@/lib/status';
 import { type BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import axios from 'axios';
+import { useState } from 'react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,7 +26,29 @@ export default function EditReturn() {
         orderReturnLoading,
     } = useOrderReturn(id)
     const { returns, pagination, setPagination, pageCount } = useReturns();
+    const [newStatus, setNewStatus] = useState("");
+    const [isEditingStatus, setIsEditingStatus] = useState(false);
+    const [updating, setUpdating] = useState(false);
 
+    const handleOrderReturnUpdate = async (value: string) => {
+        setNewStatus(value);
+    };
+
+    const submitUpdate = async () => {
+        const fields = {
+            "status": newStatus
+        }
+        try {
+            setUpdating(true);
+            const response = await axios.put("http://localhost:8000/api/returns/" + id, fields)
+            console.log("response", response)
+            setIsEditingStatus(!isEditingStatus);
+        } catch (err) {
+            console.error("error updating order return", err)
+        } finally {
+            setUpdating(false);
+        }
+    }
     if (orderReturnLoading) {
         return (
             <AppLayout breadcrumbs={breadcrumbs}>
@@ -48,13 +75,48 @@ export default function EditReturn() {
                         <p><span className="text-gray-400">Name:</span> {orderReturn?.first_name} {orderReturn?.last_name}</p>
                         <p><span className="text-gray-400">Email:</span> {orderReturn?.email}</p>
                         <p><span className="text-gray-400">Requested On:</span> {orderReturn?.created_at}</p>
-                        <p>
+                        <p className="col-span-2"><span className="text-gray-400">Preferred Resolution:</span> {orderReturn?.preferred_resolution}</p>
+
+                        {/* <p>
                             <span className="text-gray-400 mr-1">Status:</span>
                             <Badge> {orderReturn?.status.replace(/_/g, " ")}</Badge>
+                        </p> */}
+                        {/* {!isEditingStatus ? <span className="text-sm text-gray-500">Status</span> : <span className="text-sm text-gray-500">Edit status</span>} */}
+                        {!isEditingStatus ? <div className='flex justify-between items-center'>
+                            <div>
+                                <span className="text-sm text-gray-500 mr-1">Status</span>
+                                <Badge> {orderReturn?.status.replace(/_/g, " ")}</Badge>
+                            </div>
+                            <Button onClick={() => setIsEditingStatus(!isEditingStatus)}>Edit status</Button>
+                        </div>
+                            : <div className="flex items-center justify-between">
+                                <div className="flex gap-2">
+                                    <Select
+                                        defaultValue={orderReturn?.status}
+                                        onValueChange={handleOrderReturnUpdate}
+                                        disabled={updating}
+                                    >
+                                        <SelectTrigger className="w-40">
+                                            <SelectValue placeholder="Select status" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            {
+                                                returnOrderStatuses?.map((x) => (
 
-                        </p>
-                        <p className="col-span-2"><span className="text-gray-400">Preferred Resolution:</span> {orderReturn?.preferred_resolution}</p>
+                                                    <SelectItem key={x?.id} value={x?.name}>{x?.title}</SelectItem>
+                                                ))
+                                            }
+                                        </SelectContent>
+                                    </Select>
+                                    <Button onClick={submitUpdate} disabled={updating}>{updating ? 'Updating...' : 'Send'}</Button>
+                                    <Button onClick={() => setIsEditingStatus(!isEditingStatus)}>Cancel</Button>
+                                </div>
+
+
+                            </div>}
+
                     </div>
+
                 </section>
 
 

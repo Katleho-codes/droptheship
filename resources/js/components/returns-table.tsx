@@ -188,7 +188,7 @@ export const ReturnsTable = ({
                                                             </AlertDialogTitle>
                                                             <AlertDialogDescription>
                                                                 This action cannot be undone. This will permanently
-                                                                delete <span className="font-semibold">Return</span>.
+                                                                delete this order return <span className="font-semibold">{row.original.order_number}</span>.
                                                             </AlertDialogDescription>
                                                         </AlertDialogHeader>
                                                         <AlertDialogFooter>

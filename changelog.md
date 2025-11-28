@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - can create order returns
 - can filter order returns by status
 - can search order returns
+- can import and export order returns
+- can update and delete order returns
 
 ## [Unreleased] - 2025-11-23
 

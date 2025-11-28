@@ -129,6 +129,22 @@ class ReturnController extends Controller
             'orders_returns_' . now()->format('Y-m-d_His') . '.xlsx'
         );
     }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, ReturnRequests $return)
+    {
+        $validated = $request->validate([
+            'status' => 'required|string|max:20'
+        ]);
+        $return->update($validated);
+        return response()->json([
+            'message' => 'Order return updated successfully',
+            // 'updated_record' => $return
+        ], 200);
+    }
+
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -155,7 +171,7 @@ class ReturnController extends Controller
      */
     public function show($id)
     {
-        $order = DB::table('return_requests')
+        $return_request = DB::table('return_requests')
             ->join('customers', 'return_requests.customer_id', '=', 'customers.id')
             ->join('orders', 'return_requests.order_number', '=', 'orders.order_number')
             ->select(
@@ -175,6 +191,19 @@ class ReturnController extends Controller
             ->where('return_requests.id', $id)
             ->first();
 
-        return $order;
+        return $return_request;
+    }
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy($id)
+    {
+        $deleted = ReturnRequests::where('id', $id)->delete();
+
+        if (!$deleted) {
+            return response()->json(['message' => 'Not found'], 404);
+        }
+
+        return response()->json(null, 204);
     }
 }
