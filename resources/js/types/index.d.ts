@@ -141,6 +141,7 @@ export interface Return {
 export interface GetReturn {
     id: number;
     order_number: string;
+    created_at: string;
     email: string;
     first_name: string;
     last_name: string;

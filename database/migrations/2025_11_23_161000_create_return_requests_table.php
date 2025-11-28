@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('return_requests', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade');
+            $table->foreignId('order_number')->constrained('orders')->onDelete('cascade');
             $table->foreignId('customer_id')->constrained('customers')->onDelete('cascade');
             $table->string('reason');
             $table->enum('status', ['pending_review', 'awaiting_item', 'item_received', 'approved_for_refund', 'refunded', 'rejected'])->default('pending_review');

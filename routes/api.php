@@ -11,6 +11,7 @@ use App\Http\Controllers\Returns\ReturnController;
 Route::get('/orders/search', [OrderController::class, 'search']);
 Route::get('/customers/search', [CustomerController::class, 'search']);
 Route::get('/products/search', [ProductController::class, 'search']);
+Route::get('/returns/search', [ReturnController::class, 'search']);
 
 // then your apiResource routes
 Route::apiResource('orders', OrderController::class);

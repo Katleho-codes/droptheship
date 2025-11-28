@@ -11,7 +11,7 @@ class ReturnRequests extends Model
 
     protected $fillable = [
         'customer_id',
-        'product_id',
+        'order_number',
         'reason',
         'status',
         'preferred_resolution',
