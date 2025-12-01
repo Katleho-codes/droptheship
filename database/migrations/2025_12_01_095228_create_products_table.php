@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -22,7 +23,10 @@ return new class extends Migration {
             $table->integer('stock_quantity')->default(0);
             $table->integer('weight_grams')->nullable();
             $table->text('main_image_url')->nullable();
-            $table->json('additional_images')->nullable();
+            $table->string('image_one')->nullable();
+            $table->string('image_two')->nullable();
+            $table->string('image_three')->nullable();
+            $table->string('category');
             $table->enum('status', ['active', 'inactive', 'archived'])->default('active');
         });
     }

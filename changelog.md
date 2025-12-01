@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-12-01
+
+### Added
+
+- product_categories table
+- recreated products table
+- recreated orders table
+- product_options table
+- products table now supports 4 image urls
+
 ## [Unreleased] - 2025-11-28
 
 ### Added

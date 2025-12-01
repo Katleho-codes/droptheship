@@ -11,7 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::dropIfExists('internal_notes');
+        Schema::create('product_categories', function (Blueprint $table) {
+            $table->id();
+            $table->timestamps();
+            $table->string('category', length: 100);
+            $table->string('subcategory', length: 100);
+        });
     }
 
     /**
@@ -19,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('product_categories');
     }
 };

@@ -7,7 +7,6 @@
 - [x] Add/Edit/Delete products
 - [x] Product variants (size, color, etc.)
 - [x] Bulk import via CSV/Excel
-- [ ] Sync inventory from suppliers (API or scraping)
 - [x] Product status (active, inactive, archived)
 
 ### 📦 Order Management

@@ -31,10 +31,10 @@ const AddProductDialog = ({ open, setOpen }: TDialog) => {
                     </DialogHeader>
                     <Tabs defaultValue="form">
                         <TabsList>
-                            <TabsTrigger value="account">Form</TabsTrigger>
+                            <TabsTrigger value="form">Form</TabsTrigger>
                             <TabsTrigger value="import">Import</TabsTrigger>
                         </TabsList>
-                        <TabsContent value="form"><AddProductForm setOpen={setOpen}/></TabsContent>
+                        <TabsContent value="form"><AddProductForm setOpen={setOpen} /></TabsContent>
                         <TabsContent value="import"><AddProductFile /></TabsContent>
                     </Tabs>
                 </DialogContent>

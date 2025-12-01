@@ -19,7 +19,6 @@ class ProductController extends Controller
     {
         $products = Product::latest()->paginate(10);
         return response()->json($products);
-
     }
     /**
      * Import a newly created resource in storage.
@@ -29,29 +28,29 @@ class ProductController extends Controller
         $request->validate([
             'file' => 'required|mimes:xlsx,csv,txt'
         ]);
-     try {
-           Excel::import(new ProductsImport, $request->file('file'));
+        try {
+            Excel::import(new ProductsImport, $request->file('file'));
 
-       
-        return response()->json([
-            'message' => 'Products imported successfully.',
-        ], 201);
-     } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
-     $failures = $e->failures();
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Validation errors occurred.',
-            'errors'  => collect($failures)->map(function ($failure) {
-                return [
-                    'row'    => $failure->row(), // row that went wrong
-                    'attr'   => $failure->attribute(), // column name
-                    'errors' => $failure->errors(),   // actual error messages
-                    'value'  => $failure->values(),   // full row data
-                ];
-            }),
-        ], 422);
-     }
+            return response()->json([
+                'message' => 'Products imported successfully.',
+            ], 201);
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation errors occurred.',
+                'errors'  => collect($failures)->map(function ($failure) {
+                    return [
+                        'row'    => $failure->row(), // row that went wrong
+                        'attr'   => $failure->attribute(), // column name
+                        'errors' => $failure->errors(),   // actual error messages
+                        'value'  => $failure->values(),   // full row data
+                    ];
+                }),
+            ], 422);
+        }
     }
 
     /**
@@ -63,10 +62,17 @@ class ProductController extends Controller
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
             'barcode' => 'nullable|string|max:100',
-            'cost_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0',
+            // cost_price must be <= sale_price
+            'cost_price' => 'required|numeric|min:0|lte:sale_price',
+
+            // sale_price must be >= cost_price
+            'sale_price' => 'required|numeric|min:0|gte:cost_price',
             'stock_quantity' => 'nullable|integer|min:0',
             'weight_grams' => 'nullable|integer|min:0',
+            'main_image_url' => 'nullable|string',
+            'image_one' => 'nullable|string',
+            'image_two' => 'nullable|string',
+            'image_three' => 'nullable|string',
             'status' => 'in:active,inactive,archived',
         ]);
         // Generate a unique SKU
@@ -80,11 +86,11 @@ class ProductController extends Controller
         return response()->json([
             'message' => 'Product created successfully.',
             'product' => $product,
-            'success'=>true
+            'success' => true
         ], 201);
     }
 
-        public function search(Request $request)
+    public function search(Request $request)
     {
         $q = $request->string('q');
 
@@ -121,6 +127,10 @@ class ProductController extends Controller
             'sale_price' => 'sometimes|numeric|min:0|nullable',
             'stock_quantity' => 'sometimes|integer|min:0|nullable',
             'weight_grams' => 'sometimes|integer|min:0|nullable',
+            'main_image_url' => 'sometimes|string|max:100|nullable',
+            'image_one' => 'sometimes|string|max:100|nullable',
+            'image_two' => 'sometimes|string|max:100|nullable',
+            'image_three' => 'sometimes|string|max:100|nullable',
             'status' => 'sometimes|in:active,inactive,archived|nullable',
         ]);
         $product->update($validated);

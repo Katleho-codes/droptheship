@@ -1,6 +1,7 @@
 <?php
 
 namespace Database\Factories;
+
 use App\Models\Product;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -29,10 +30,9 @@ class ProductFactory extends Factory
             'stock_quantity' => $this->faker->numberBetween(0, 500),
             'weight_grams' => $this->faker->optional()->numberBetween(100, 10000), // 100g – 10kg
             'main_image_url' => $this->faker->imageUrl(640, 480, 'products', true),
-            'additional_images' => json_encode([
-                $this->faker->imageUrl(640, 480, 'products', true),
-                $this->faker->imageUrl(640, 480, 'products', true)
-            ]),
+            'image_one' => $this->faker->imageUrl(640, 480, 'products', true),
+            'image_two' => $this->faker->imageUrl(640, 480, 'products', true),
+            'image_three' => $this->faker->imageUrl(640, 480, 'products', true),
             'status' => $this->faker->randomElement(['active', 'inactive', 'archived']),
             'created_at' => $createdAt,
             'updated_at' => $updatedAt,

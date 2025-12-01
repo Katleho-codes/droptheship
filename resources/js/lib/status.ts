@@ -30,3 +30,20 @@ export const returnOrderStatuses = [
         title: 'Rejected',
     },
 ];
+export const productStatuses = [
+    {
+        id: 1,
+        name: 'active',
+        title: 'Active',
+    },
+    {
+        id: 2,
+        name: 'inactive',
+        title: 'Inactive',
+    },
+    {
+        id: 3,
+        name: 'archived',
+        title: 'Archived',
+    },
+];
