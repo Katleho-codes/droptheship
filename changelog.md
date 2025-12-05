@@ -9,11 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- create, get all and import product categories
+
+## [Unreleased] - 2025-12-01
+
+### Added
+
 - product_categories table
 - recreated products table
 - recreated orders table
 - product_options table
 - products table now supports 4 image urls
+- image slider reuseable component
 
 ## [Unreleased] - 2025-11-28
 

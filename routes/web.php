@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Customers\CustomerController;
 use App\Http\Controllers\Products\ProductController;
+use App\Http\Controllers\ProductCategories\ProductCategoriesController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Orders\OrderController;
 use App\Http\Controllers\ImportController;
@@ -23,16 +24,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // products
 
     Route::prefix('products')->group(function () {
+
+        // index
         Route::get('/', function () {
             return Inertia::render('products/index');
         })->name('products.index');
 
-        Route::post('/create', function () {
+        // create form
+        Route::get('/create', function () {
             return Inertia::render('products/create');
         })->name('products.create');
 
-
-
+        // dynamic routes (keep LAST)
         Route::get('/{id}', function ($id) {
             return Inertia::render('products/show', ['id' => $id]);
         })->name('products.show');
@@ -40,11 +43,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/{id}/edit', function ($id) {
             return Inertia::render('products/edit', ['id' => $id]);
         })->name('products.edit');
-
-        // Import users/products via CSV/Excel
-        Route::post('/import', [ProductController::class, 'import'])
-            ->name('products.import');
     });
+
+    // product categories
+    Route::prefix('categories')->group(function () {
+
+
+        Route::get('/create', function () {
+            return Inertia::render('categories/create');
+        })->name('categories.create');
+
+
+        Route::get('/', function () {
+            return Inertia::render('categories/index');
+        })->name('categories.index');
+
+        // import
+        Route::post('/categories/import', [ProductCategoriesController::class, 'import'])
+            ->name('categories.import');
+    });
+
 
     // orders
     Route::prefix('orders')->group(function () {

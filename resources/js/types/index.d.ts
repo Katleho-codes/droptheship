@@ -152,7 +152,6 @@ export interface GetReturn {
     refund_method: string;
 }
 
-
 export interface Supplier {
     id: number;
     name: string;
@@ -192,3 +191,8 @@ export type ProductsTableProps = {
     pageCount: number;
     showPagination?: boolean; // optional if you want to show a spinner
 };
+export interface TProductCategories {
+    id: number;
+    category: string;
+    subcategory: string;
+}
