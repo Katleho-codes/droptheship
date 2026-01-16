@@ -13,6 +13,7 @@ Route::get('/orders/search', [OrderController::class, 'search']);
 Route::get('/customers/search', [CustomerController::class, 'search']);
 Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/returns/search', [ReturnController::class, 'search']);
+Route::delete('/orders/bulk-delete', [OrderController::class, 'bulkDelete']);
 
 // then your apiResource routes
 Route::apiResource('orders', OrderController::class);

@@ -61,6 +61,7 @@ class ProductController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
+            'category' => 'required|string|max:100',
             'barcode' => 'nullable|string|max:100',
             // cost_price must be <= sale_price
             'cost_price' => 'required|numeric|min:0|lte:sale_price',
@@ -114,6 +115,24 @@ class ProductController extends Controller
         return $product;
     }
 
+    public function showPublic($slug, $publicId)
+    {
+        $product = Product::where('public_id', $publicId)
+            ->with('variants')
+            ->firstOrFail();
+
+        // SEO redirect if slug changed
+        if ($slug !== $product->slug) {
+            return redirect()->route('product.public', [
+                'slug' => $product->slug,
+                'publicId' => $product->public_id
+            ], 301);
+        }
+
+        return inertia('storefront/product-show', [
+            'product' => $product
+        ]);
+    }
     /**
      * Update the specified resource in storage.
      */

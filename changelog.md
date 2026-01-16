@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2026-01-16
+
+### Added
+
+- soft delete in orders table
+- tweaked the data fetch of orders to not include rows soft deleted
+- category field to product
+- product categories table
+- slug table column in orders
+- slug history table for orders
+- public id from orders table
+- allow select all rows in orders, customers, products, returns and product categories tables
+- show how rows selected, and how many rows exist in orders, customers, products, returns and product categories tables
+- bulk delete in orders table
+
+
+### Fixed
+
+- creating an order from admin side duplicates order
+
 ## [Unreleased] - 2025-12-01
 
 ### Added

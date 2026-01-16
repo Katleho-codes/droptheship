@@ -208,9 +208,15 @@ export const CustomersTable = ({
             </div>
             {
                 showPagination ? <div className="flex items-center justify-end space-x-2 py-4">
-                    <div className="text-muted-foreground flex-1 text-sm">
-                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} row(s) selected
-                    </div>
+                   <div className='flex flex-col flex-1 gap-2 md:flex md:flex-row md:justify-content-between align-items-center'>
+                        <p className="text-muted-foreground md:flex-1 text-sm">
+                            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                        </p>
+                        <p className="text-muted-foreground md:flex-1 text-sm">
+                            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                            {table.getFilteredRowModel().rows.length} row(s) selected.
+                        </p>
+                   </div>
                     <div className="space-x-2">
                         <Button
                             variant="outline"

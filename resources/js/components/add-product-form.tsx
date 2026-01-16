@@ -1,18 +1,21 @@
 import axios from 'axios';
-import { FormEventHandler, useState } from 'react';
+import { FormEventHandler, useEffect, useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from './ui/select';
 import { productStatuses, returnOrderStatuses } from '@/lib/status';
 import { toast } from 'react-hot-toast';
+import { useProductCategories } from '@/hooks/use-product-categories';
 
 
 export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) => void }) {
 
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
+  const [category, setCategory] = useState("")
+  const [customCategory, setCustomCategory] = useState("")
   const [barcode, setBarcode] = useState("")
   const [cost_price, setCostPrice] = useState("")
   const [sale_price, setSalePrice] = useState("")
@@ -25,16 +28,37 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
   const [status, setStatus] = useState("");
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false)
-  const next = () => setStep((s) => Math.min(s + 1, 12));
+  const next = () => setStep((s) => Math.min(s + 1, 13));
   const prev = () => setStep((s) => Math.max(s - 1, 1));
-  const totalSteps = 8;
   const [errors, setErrors] = useState<Record<string, string[]>>({});
+
+  const {
+    productCategories, pagination,
+    setPagination, fetchCategories } = useProductCategories();
+
+  useEffect(() => {
+    fetchCategories(pagination.pageIndex + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pagination.pageIndex]);
+
+  const handleCategoryChange = (val: string) => {
+    setCategory(val);
+
+    // Reset custom category if the user selects something other than "other"
+    if (val !== 'other') {
+      setCustomCategory('');
+    }
+  };
+
+
+
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
-
+    const finalCategoryValue = category === 'other' ? customCategory : category;
     const fields = {
       "name": name,
       "description": description,
+      "category": finalCategoryValue,
       "barcode": barcode,
       "sale_price": sale_price,
       "cost_price": cost_price,
@@ -46,6 +70,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
       "image_three": image_three,
       "status": status
     }
+    console.log("fields", fields)
 
     try {
       setLoading(true);
@@ -61,6 +86,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         toast(data?.message);
       }
     } catch (error: any) {
+      console.error("add product error", error)
       if (error?.response?.data?.message) toast.error(error?.response.data.message);
       if (error?.response && error.response.status === 422) setErrors(error?.response.data.errors);
     } finally {
@@ -109,6 +135,48 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
       }
       {
         step === 3 && (
+          <div className="md:col-span-2">
+            <Label className="block font-medium mb-1">Category</Label>
+            <Select value={category} onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select a category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Categories</SelectLabel>
+                  {
+                    productCategories?.map((cat) => (
+                      <SelectItem key={cat?.id} value={cat?.category}>{cat?.category}</SelectItem>
+
+                    ))
+                  }
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            {/* Conditional Rendering for the 'Other' input */}
+            {category === 'other' ? (
+              <>
+                <Label className="block font-medium mb-1">Custom category</Label>
+                <Input
+                  type="text"
+                  placeholder="Please specify"
+                  name="category"
+                  value={customCategory}
+                  onChange={(e) => setCustomCategory(e.target.value)}
+
+                />
+              </>
+            ) : null}
+
+            {errors.category && (
+              <p className="text-red-500 text-sm">{errors.category[0]}</p>
+            )}
+          </div>
+        )
+      }
+      {
+        step === 4 && (
           <div>
             <Label className="block font-medium mb-1">Barcode</Label>
             <Input
@@ -126,7 +194,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 4 && (
+        step === 5 && (
           <div>
             <Label className="block font-medium mb-1">Cost Price</Label>
             <Input
@@ -144,7 +212,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 5 && (
+        step === 6 && (
           <div>
             <Label className="block font-medium mb-1">Sale Price</Label>
             <Input
@@ -162,7 +230,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 6 && (
+        step === 7 && (
           <div>
             <Label className="block font-medium mb-1">Stock Quantity</Label>
             <Input
@@ -180,7 +248,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 7 && (
+        step === 8 && (
           <div>
             <Label className="block font-medium mb-1">Weight (grams)</Label>
             <Input
@@ -198,7 +266,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 8 && (
+        step === 9 && (
           <div>
             <Label className="block font-medium mb-1">Main image url</Label>
             <Input
@@ -216,7 +284,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 9 && (
+        step === 10 && (
           <div>
             <Label className="block font-medium mb-1">Product image one</Label>
             <Input
@@ -234,7 +302,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 10 && (
+        step === 11 && (
           <div>
             <Label className="block font-medium mb-1">Product image two</Label>
             <Input
@@ -252,7 +320,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 11 && (
+        step === 12 && (
           <div>
             <Label className="block font-medium mb-1">Product image three</Label>
             <Input
@@ -270,7 +338,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
         )
       }
       {
-        step === 12 && (
+        step === 13 && (
           <div>
             <Label className="block font-medium mb-1">Status</Label>
             <Select
@@ -311,7 +379,7 @@ export default function AddProductForm({ setOpen }: { setOpen: (value: boolean) 
           <span />
         )}
 
-        {step < 12 ? (
+        {step < 13 ? (
           <Button
             type='button'
             onClick={next}

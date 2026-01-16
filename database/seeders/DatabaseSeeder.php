@@ -20,8 +20,8 @@ class DatabaseSeeder extends Seeder
     {
         // Create a test user
         User::factory()->create([
-       'name' => Str::random(10),
-            'email' => Str::random(10).'@example.com',
+            'name' => Str::random(10),
+            'email' => Str::random(10) . '@example.com',
         ]);
 
         // Create 10 random users
@@ -33,9 +33,6 @@ class DatabaseSeeder extends Seeder
         Supplier::factory(100)->create();
 
         // Create 20 orders linked to random users
-        Order::factory(100)->create([
-            'user_id' => $customers->random()->id,
-            'product_id' => Product::factory(100)->create()->random()->id,
-        ]);
+        
     }
 }

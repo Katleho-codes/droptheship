@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { MoreHorizontal } from 'lucide-react';
 import { useOrders } from '@/hooks/use-orders';
+import axios from 'axios';
 
 type OrdersTableProps = {
     data: Order[];
@@ -36,8 +37,8 @@ type OrdersTableProps = {
     setPagination: React.Dispatch<React.SetStateAction<PaginationState>>;
     pageCount: number;
     showPagination?: boolean; // optional if you want to show a spinner
-    setStatusFilter: (data:string)=>void;
-    exportFilteredOrders: ()=>void;
+    setStatusFilter: (data: string) => void;
+    exportFilteredOrders: () => void;
 };
 
 
@@ -47,7 +48,7 @@ export const OrdersTable = ({
     setPagination,
     pageCount,
     showPagination,
-    setStatusFilter,exportFilteredOrders
+    setStatusFilter, exportFilteredOrders
 }: OrdersTableProps) => {
     const [sorting, setSorting] = useState<SortingState>([])
     const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
@@ -83,41 +84,60 @@ export const OrdersTable = ({
     const handleRowSelect = (row: any) => {
         setSelectedRowId(row.id)
     }
+    const deleteSelected = async () => {
+        const ids = table
+            .getSelectedRowModel()
+            .rows
+            .map(row => row.original.id);
+        console.log(ids)
 
-    const {deleteOrder, deleteOrderLoading}=useOrders();
+        try {
+            const response = await axios.delete("http://localhost:8000/api/orders/bulk-delete", {
+                data: { ids },
+            });
+            console.log("bulk delete order response", response);
+        } catch (error) {
+            console.log("bulk delete order error", error)
+            setRowSelection({});
+        }
+    }
+    const selectedCount = table.getSelectedRowModel().rows.length;
+
+    const { deleteOrder, deleteOrderLoading } = useOrders();
 
     return (
         <>
             <div className="flex justify-between items-center py-4">
-               <div className="flex gap-4 items-center flex-col md:flex-row">
-                 <Input
-                    placeholder="Search orders"
-                    value={(table.getColumn("order_number")?.getFilterValue() as string) ?? ""}
-                    onChange={(event) =>
-                        table.getColumn("order_number")?.setFilterValue(event.target.value)
-                    }
-                    className="max-w-sm"
-                />
-                 <Select onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full">
-                        <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            <SelectLabel>Statuses</SelectLabel>
-                            <SelectItem value="pending">Pending</SelectItem>
-                            <SelectItem value="processing">Processing</SelectItem>
-                            <SelectItem value="completed">Completed</SelectItem>
-                            <SelectItem value="cancelled">Cancelled</SelectItem>
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-               </div>
+                <div className="flex gap-4 items-center flex-col md:flex-row">
+                    <Input
+                        placeholder="Search orders"
+                        value={(table.getColumn("order_number")?.getFilterValue() as string) ?? ""}
+                        onChange={(event) =>
+                            table.getColumn("order_number")?.setFilterValue(event.target.value)
+                        }
+                        className="max-w-sm"
+                    />
+                    <Select onValueChange={setStatusFilter}>
+                        <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Filter by status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectGroup>
+                                <SelectLabel>Statuses</SelectLabel>
+                                <SelectItem value="pending">Pending</SelectItem>
+                                <SelectItem value="processing">Processing</SelectItem>
+                                <SelectItem value="completed">Completed</SelectItem>
+                                <SelectItem value="cancelled">Cancelled</SelectItem>
+                            </SelectGroup>
+                        </SelectContent>
+                    </Select>
+                </div>
                 {/* <Button className='cursor-pointer' onClick={() => setOpenAddOrderModal(true)}>Add orders</Button> */}
-           <div className='flex items-center gap-4 flex-col-reverse md:flex-row'>
-                 <Button className='cursor-pointer w-full lg:w-auto' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
-                <Button className='cursor-pointer' variant={"outline"} onClick={exportFilteredOrders}>Export orders</Button>
-           </div>
+                <div className='flex items-center gap-4 flex-col-reverse md:flex-row'>
+                    {selectedCount > 1 && (<Button className='cursor-pointer w-full lg:w-auto' onClick={deleteSelected}>Delete marked ({selectedCount})</Button>)}
+                    <Button className='cursor-pointer w-full lg:w-auto' onClick={() => router.visit(route("orders.create"))}>Add order</Button>
+                    <Button className='cursor-pointer' variant={"outline"} onClick={exportFilteredOrders}>Export orders</Button>
+                </div>
 
             </div>
             <div className="overflow-hidden rounded-md border">
@@ -228,8 +248,14 @@ export const OrdersTable = ({
             </div>
             {
                 showPagination ? <div className="flex items-center justify-end space-x-2 py-4">
-                    <div className="text-muted-foreground flex-1 text-sm">
-                        Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()} row(s) selected
+                    <div className='flex flex-col flex-1 gap-2 md:flex md:flex-row md:justify-content-between align-items-center'>
+                        <p className="text-muted-foreground md:flex-1 text-sm">
+                            Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+                        </p>
+                        <p className="text-muted-foreground md:flex-1 text-sm">
+                            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+                            {table.getFilteredRowModel().rows.length} row(s) selected.
+                        </p>
                     </div>
                     <div className="space-x-2">
                         <Button

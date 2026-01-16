@@ -22,6 +22,7 @@ class OrderController extends Controller
         $orders = DB::table('orders')
             ->join('customers', 'orders.user_id', '=', 'customers.id')
             ->join('products', 'orders.product_id', '=', 'products.id')
+            ->whereNull('orders.deleted_at')
             ->select(
                 'orders.*',
                 'customers.email as email',
@@ -102,6 +103,7 @@ class OrderController extends Controller
         $orders = DB::table('orders')
             ->join('customers', 'orders.user_id', '=', 'customers.id')
             ->join('products', 'orders.product_id', '=', 'products.id')
+            ->whereNull('orders.deleted_at')
             ->select(
                 'orders.*',
                 'customers.email as email',
@@ -182,6 +184,7 @@ class OrderController extends Controller
         $order = DB::table('orders')
             ->join('customers', 'orders.user_id', '=', 'customers.id')
             ->join('products', 'orders.product_id', '=', 'products.id')
+            ->whereNull('orders.deleted_at')
             ->select(
                 'orders.*',
                 'customers.email as email',
@@ -206,7 +209,7 @@ class OrderController extends Controller
     {
         $orders = DB::table('orders')
             ->join('customers', 'orders.user_id', '=', 'customers.id')
-            // ->join('products', 'orders.product_id', '=', 'products.id')
+            ->whereNull('orders.deleted_at')
             ->select(
                 'orders.*',
                 'customers.email as email',
@@ -244,6 +247,22 @@ class OrderController extends Controller
         return response()->json([
             'message' => 'Order updated successfully',
         ], 200);
+    }
+
+    public function bulkDelete(Request $request)
+    {
+        $validated = $request->validate([
+            'ids' => ['required', 'array'],
+            'ids.*' => ['integer', 'exists:orders,id'],
+        ]);
+
+        DB::transaction(function () use ($validated) {
+            Order::whereIn('id', $validated['ids'])->delete();
+        });
+
+        return response()->json([
+            'message' => 'Orders deleted successfully',
+        ]);
     }
 
     /**

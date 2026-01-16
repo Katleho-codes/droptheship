@@ -53,6 +53,8 @@ export default function AddOrderForm() {
   const [errors, setErrors] = useState<Record<string, string[]>>({});
 
 
+
+
   const handleSubmit: FormEventHandler = async (e) => {
     e.preventDefault();
 
@@ -68,7 +70,6 @@ export default function AddOrderForm() {
       "quantity": quantity,
       "shipping_cost": 0 // todo: when flow makes sense will come back to this, 0 for now since it is required
     }
-
     try {
       setLoading(true);
       setErrors({});
@@ -101,7 +102,7 @@ export default function AddOrderForm() {
 
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form>
       {
         step === 1 && (
           <div className='w-full'>
@@ -391,7 +392,8 @@ export default function AddOrderForm() {
           </Button>
         ) : (
           <Button
-            type='submit'
+            type='button'
+            onClick={handleSubmit as any}
             className="cursor-pointer"
           >
             {loading ? "Saving..." : "Save"}
